@@ -143,7 +143,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## 👥 Team
 
-- Your Name - Initial work - [YourGitHub](https://github.com/d3bn4th)
+- Arihant Debnath - Initial work - [d3bn4th](https://github.com/d3bn4th)
 
 ## 🙏 Acknowledgments
 
