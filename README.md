@@ -7,6 +7,7 @@ Art Realm is a modern, full-stack e-commerce platform for buying and selling art
 ## 🌟 Features
 
 ### For Art Enthusiasts
+
 - **Browse Artwork**: Explore a curated collection of original artwork
 - **Search & Filter**: Find artwork by category, price range, or artist
 - **Detailed Product Pages**: View high-resolution images and detailed artwork information
@@ -14,6 +15,7 @@ Art Realm is a modern, full-stack e-commerce platform for buying and selling art
 - **Responsive Design**: Seamless experience across all devices
 
 ### For Artists
+
 - **Artist Profiles**: Dedicated pages for artists to showcase their work
 - **Artwork Management**: Easy upload and management of artwork listings
 - **Sales Dashboard**: Track sales and manage orders
@@ -75,11 +77,13 @@ art-realm/
 ## 📱 Key Features Explained
 
 ### 1. Homepage
+
 - Hero section with featured artwork
 - Grid layout of available artwork
 - Quick access to categories
 
 ### 2. Artwork Pages
+
 - Individual product pages for each artwork
 - High-resolution image display
 - Detailed artwork information
@@ -87,17 +91,20 @@ art-realm/
 - Add to cart functionality
 
 ### 3. Search & Filter
+
 - Real-time search functionality
 - Filter by category
 - Sort by price, popularity, etc.
 
 ### 4. Shopping Cart
+
 - Add/remove items
 - Quantity adjustment
 - Price calculations
 - Checkout process
 
 ### 5. Artist Features
+
 - Artist profile pages
 - Artwork management
 - Sales tracking
@@ -105,6 +112,7 @@ art-realm/
 ## 🔧 Configuration
 
 ### Environment Variables
+
 Create a `.env.local` file in the root directory:
 ```env
 NEXT_PUBLIC_API_URL=your_api_url
@@ -112,6 +120,7 @@ NEXT_PUBLIC_API_URL=your_api_url
 ```
 
 ### Deployment
+
 The project is configured for easy deployment on Vercel:
 1. Push your code to GitHub
 2. Import the project in Vercel
