@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ARTIST
+  BUYER
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      UserRole
+  bio       String?
+  location  String?
+  image     String?
+  specialties String[]
+  artworks  Artwork[]
+  orders    Order[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Artwork {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  price        Float
+  category     String
+  image        String
+  materials    String[]
+  isEcoFriendly Boolean @default(false)
+  artist       User     @relation(fields: [artistId], references: [id])
+  artistId     String
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  status      String   // pending, completed, cancelled
+  totalAmount Float
+  buyer       User     @relation(fields: [buyerId], references: [id])
+  buyerId     String
+  artwork     Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+} 

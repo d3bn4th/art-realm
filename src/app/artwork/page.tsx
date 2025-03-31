@@ -1,400 +1,229 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Fragment } from 'react';
-import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { getArtworkImagePath } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
-const sortOptions = [
-  { name: 'Most Popular', href: '#', current: true },
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Price: Low to High', href: '#', current: false },
-  { name: 'Price: High to Low', href: '#', current: false },
-]
+interface Artist {
+  id: string;
+  name: string;
+  email: string;
+  bio: string;
+  location: string;
+  specialties: string[];
+}
 
-const filters = [
-  {
-    id: 'category',
-    name: 'Category',
-    options: [
-      { value: 'painting', label: 'Painting', checked: false },
-      { value: 'digital', label: 'Digital Art', checked: false },
-      { value: 'photography', label: 'Photography', checked: false },
-      { value: 'sculpture', label: 'Sculpture', checked: false },
-    ],
-  },
-  {
-    id: 'price',
-    name: 'Price Range',
-    options: [
-      { value: 'budget', label: 'Under $500', checked: false },
-      { value: 'mid-range', label: 'Under $1000', checked: false },
-      { value: 'premium', label: 'Under $2000', checked: false },
-      { value: 'luxury', label: '$2000+', checked: false },
-    ],
-  },
-]
-
-// Mock data - replace with actual data from your backend
-const artworks = [
-  // {
-  //   id: 1,
-  //   title: 'Abstract Harmony',
-  //   artist: 'Sarah Chen',
-  //   price: 1200,
-  //   image: '/images/artwork1.jpg',
-  //   category: 'Painting',
-  // },
-  // Add more artworks...
-  {
-    id: 1,
-    title: "LORD LAKSHMI NARASIMHA",
-    artist: "A. Laith Rahul",
-    price: 1200,
-    category: "Painting",
-    image: "/images/abc1.jpeg",
-    description: "A masterpiece showcasing LORD NARASIMHA ALONG WITH BHAKTHA PRAHLADA. DIMENSIONS 36 X 50 INCHES"
-  },
-  {
-    id: 2,
-    title: "VEERABHADRA",
-    artist: "A. Laith Rahul",
-    price: 950,
-    category: "Painting",
-    image: "/images/abc2.jpeg",
-    description: "LORD VEERABHADRA AN ANSH OF LORD SHIVA IN FIRE BACKGROUNG 12 X 12 INCH."
-  },
-  {
-    id: 3,
-    title: "CALM NARASIMHA",
-    artist: "A. Laith Rahul",
-    price: 850,
-    category: "Painting",
-    image: "/images/abc3.jpg",
-    description: "CALM NARASIMHA HOLDING BABY PRAHLADA ON HIS LAP , 17X22 INCH."
-  },
-  {
-    id: 4,
-    title: "DEAR IN A CORNER",
-    artist: "A. Laith Rahul",
-    price: 1400,
-    category: "Photography",
-    image: "/images/abc4.jpg",
-    description: "A SATURATED DEAR ON CORNER OF MOUNTAIN UNDER AMAZING TREE BACKGROUND."
-  },
-  {
-    id: 5,
-    title: "KRISHNA ARJUNA",
-    artist: "A. Laith Rahul",
-    price: 750,
-    category: "Digital Art",
-    image: "/images/abc5.jpg",
-    description: "LORD KRISHNA RUNNING THE CHARIOT WHERE ARJUNA IS FIGHTING WITH THE BOW"
-  },
-  {
-    id: 6,
-    title: "FANTASY CASTLE",
-    artist: "A. Laith Rahul",
-    price: 1100,
-    category: "Painting",
-    image: "/images/abc6.jpg",
-    description: "A CASTLE ON MOUNTAINS WITH AMAZING REFLECTIVE WATERFALL."
-  },
-  {
-    id: 7,
-    title: "The Starry Night",
-    artist: "Vincent van Gogh",
-    price: 1200,
-    category: "Painting",
-    image: "https://lh3.googleusercontent.com/Pd2nCUHUz4Ruc76LRh1-H0Dldl04hWSXw8P9uCYZ4TIWP7yNPArIgWlHZrf1qT9T=s1200",
-    description: "A masterpiece showcasing swirling clouds, bright stars, and a crescent moon over a village."
-  },
-  {
-    id: 8,
-    title: "Girl with a Pearl Earring",
-    artist: "Johannes Vermeer",
-    price: 950,
-    category: "Painting",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/800px-1665_Girl_with_a_Pearl_Earring.jpg",
-    description: "A contemporary piece exploring color and form through abstract expression."
-  },
-  {
-    id: 9,
-    title: "Mona Lisa",
-    artist: "Leonardo da Vinci",
-    price: 850,
-    category: "Painting",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/1200px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
-    description: "the best known, the most visited, the most written about, the most sung about, [and] the most parodied work of art in the world."
-  },
-  {
-    id: 10,
-    title: "Nature's Whisper",
-    artist: "Emma Thompson",
-    price: 1400,
-    category: "Photography",
-    image: "https://images.unsplash.com/photo-1578911373434-0cb395d2cbfb?auto=format&fit=crop&q=",
-    description: "A stunning photograph capturing the raw beauty of nature in its purest form."
-  },
-  {
-    id: 11,
-    title: "Digital Dystopia",
-    artist: "Alex Rivera",
-    price: 750,
-    category: "Digital Art",
-    image: "https://images.unsplash.com/photo-1576773689115-5cd2b0223523?auto=format&fit=crop&q=80",
-    description: "A futuristic digital artwork exploring themes of technology and humanity."
-  }
-]
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+interface Artwork {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  isEcoFriendly: boolean;
+  materials: string[];
+  artistId: string;
+  artist: Artist;
 }
 
 export default function ArtworkCatalog() {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [isEcoFriendly, setIsEcoFriendly] = useState<boolean | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchArtworks = async () => {
+      try {
+        const response = await fetch('/api/artworks');
+        if (!response.ok) {
+          throw new Error('Failed to fetch artworks');
+        }
+        const data = await response.json();
+        setArtworks(data);
+        
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(data.map((artwork: Artwork) => artwork.category))
+        ) as string[];
+        setCategories(uniqueCategories);
+        
+        // Find max price for price range
+        const maxPrice = Math.max(...data.map((artwork: Artwork) => artwork.price));
+        setPriceRange([0, maxPrice]);
+      } catch (error) {
+        console.error('Error:', error);
+        toast.error('Failed to load artworks. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArtworks();
+  }, []);
+
+  const filteredArtworks = artworks.filter((artwork) => {
+    const matchesSearch = artwork.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         artwork.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || artwork.category === selectedCategory;
+    const matchesPrice = artwork.price >= priceRange[0] && artwork.price <= priceRange[1];
+    const matchesEcoFriendly = isEcoFriendly === null || artwork.isEcoFriendly === isEcoFriendly;
+
+    return matchesSearch && matchesCategory && matchesPrice && matchesEcoFriendly;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white">
-      <div>
-        {/* Mobile filter dialog */}
-        <Transition.Root show={mobileFiltersOpen} as={Fragment}>
-          <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
-            <Transition.Child
-              as={Fragment}
-              enter="transition-opacity ease-linear duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity ease-linear duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-black bg-opacity-25" />
-            </Transition.Child>
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">All Artworks</h1>
 
-            <div className="fixed inset-0 z-40 flex">
-              <Transition.Child
-                as={Fragment}
-                enter="transition ease-in-out duration-300 transform"
-                enterFrom="translate-x-full"
-                enterTo="translate-x-0"
-                leave="transition ease-in-out duration-300 transform"
-                leaveFrom="translate-x-0"
-                leaveTo="translate-x-full"
-              >
-                <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
-                  <div className="flex items-center justify-between px-4">
-                    <h2 className="text-lg font-medium text-gray-900">Filters</h2>
-                    <button
-                      type="button"
-                      className="-mr-2 flex h-10 w-10 items-center justify-center p-2 text-gray-400 hover:text-gray-500"
-                      onClick={() => setMobileFiltersOpen(false)}
-                    >
-                      <span className="sr-only">Close menu</span>
-                      <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-                  </div>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <div className="md:w-1/4">
+            <div className="bg-gray-900 p-6 rounded-lg space-y-6 sticky top-8">
+              <h2 className="text-xl font-semibold mb-4">Filters</h2>
+              
+              {/* Search */}
+              <div className="space-y-2">
+                <Label htmlFor="search">Search</Label>
+                <Input
+                  id="search"
+                  type="text"
+                  placeholder="Search artworks..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-gray-800 border-gray-700 text-white"
+                />
+              </div>
 
-                  {/* Filters */}
-                  <form className="mt-4">
-                    {filters.map((section) => (
-                      <Disclosure as="div" key={section.name} className="border-t border-gray-200 px-4 py-6">
-                        {({ open }) => (
-                          <>
-                            <h3 className="-mx-2 -my-3 flow-root">
-                              <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-sm text-gray-400">
-                                <span className="font-medium text-gray-900">{section.name}</span>
-                                <span className="ml-6 flex items-center">
-                                  {open ? (
-                                    <MinusIcon className="h-5 w-5" aria-hidden="true" />
-                                  ) : (
-                                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                                  )}
-                                </span>
-                              </Disclosure.Button>
-                            </h3>
-                            <Disclosure.Panel className="pt-6">
-                              <div className="space-y-6">
-                                {section.options.map((option, optionIdx) => (
-                                  <div key={option.value} className="flex items-center">
-                                    <input
-                                      id={`filter-mobile-${section.id}-${optionIdx}`}
-                                      name={`${section.id}[]`}
-                                      defaultValue={option.value}
-                                      type="checkbox"
-                                      defaultChecked={option.checked}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label
-                                      htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                                      className="ml-3 text-sm text-gray-500"
-                                    >
-                                      {option.label}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
-                    ))}
-                  </form>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </Dialog>
-        </Transition.Root>
-
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">Artwork Catalog</h1>
-
-            <div className="flex items-center">
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                    Sort
-                    <ChevronDownIcon
-                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
-                </div>
-
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
+              {/* Category Filter */}
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full h-10 rounded-md border border-gray-700 bg-gray-800 text-white px-3"
                 >
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="py-1">
-                      {sortOptions.map((option) => (
-                        <Menu.Item key={option.name}>
-                          {({ active }) => (
-                            <a
-                              href={option.href}
-                              className={classNames(
-                                option.current ? 'font-medium text-gray-900' : 'text-gray-500',
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm'
-                              )}
-                            >
-                              {option.name}
-                            </a>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <button
-                type="button"
-                className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
-                onClick={() => setMobileFiltersOpen(true)}
-              >
-                <span className="sr-only">Filters</span>
-                <FunnelIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
+              {/* Price Range Filter */}
+              <div className="space-y-2">
+                <Label>Price Range (₹)</Label>
+                <div className="flex flex-col space-y-2">
+                  <Input
+                    type="number"
+                    placeholder="Min price"
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                  <Input
+                    type="number"
+                    placeholder="Max price"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                    className="bg-gray-800 border-gray-700 text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Eco-Friendly Filter */}
+              <div className="space-y-2">
+                <Label htmlFor="eco-friendly">Eco-Friendly</Label>
+                <select
+                  id="eco-friendly"
+                  value={isEcoFriendly === null ? '' : isEcoFriendly.toString()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setIsEcoFriendly(value === '' ? null : value === 'true');
+                  }}
+                  className="w-full h-10 rounded-md border border-gray-700 bg-gray-800 text-white px-3"
+                >
+                  <option value="">All</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+
+              {/* Results Count */}
+              <div className="pt-4 border-t border-gray-800">
+                <p className="text-gray-400">
+                  Showing {filteredArtworks.length} of {artworks.length} artworks
+                </p>
+              </div>
             </div>
           </div>
 
-          <section aria-labelledby="products-heading" className="pb-24 pt-6">
-            <h2 id="products-heading" className="sr-only">
-              Artworks
-            </h2>
-
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-              {/* Filters */}
-              <form className="hidden lg:block">
-                {filters.map((section) => (
-                  <Disclosure as="div" key={section.name} className="border-b border-gray-200 py-6">
-                    {({ open }) => (
-                      <>
-                        <h3 className="-my-3 flow-root">
-                          <Disclosure.Button className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                            <span className="font-medium text-gray-900">{section.name}</span>
-                            <span className="ml-6 flex items-center">
-                              {open ? (
-                                <MinusIcon className="h-5 w-5" aria-hidden="true" />
-                              ) : (
-                                <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                              )}
-                            </span>
-                          </Disclosure.Button>
-                        </h3>
-                        <Disclosure.Panel className="pt-6">
-                          <div className="space-y-4">
-                            {section.options.map((option, optionIdx) => (
-                              <div key={option.value} className="flex items-center">
-                                <input
-                                  id={`filter-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  defaultValue={option.value}
-                                  type="checkbox"
-                                  defaultChecked={option.checked}
-                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <label
-                                  htmlFor={`filter-${section.id}-${optionIdx}`}
-                                  className="ml-3 text-sm text-gray-600"
-                                >
-                                  {option.label}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </Disclosure.Panel>
-                      </>
-                    )}
-                  </Disclosure>
-                ))}
-              </form>
-
-              {/* Artwork grid */}
-              <div className="lg:col-span-3">
-                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-                  {artworks.map((artwork) => (
-                    <div key={artwork.id} className="group relative">
-                      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200">
-                        <Image
-                          src={artwork.image}
-                          alt={artwork.title}
-                          className="h-full w-full object-cover object-center group-hover:opacity-75"
-                          width={500}
-                          height={500}
-                        />
-                      </div>
-                      <div className="mt-4 flex justify-between">
-                        <div>
-                          <h3 className="text-sm text-gray-700">
-                            <Link href={`/artwork/${artwork.id}`}>
-                              <span aria-hidden="true" className="absolute inset-0" />
-                              {artwork.title}
-                            </Link>
-                          </h3>
-                          <p className="mt-1 text-sm text-gray-500">{artwork.artist}</p>
+          {/* Artworks Grid */}
+          <div className="md:w-3/4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredArtworks.map((artwork) => (
+                <Link href={`/artwork/${artwork.id}`} key={artwork.id} className="block">
+                  <div className="bg-gray-900 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/20 group">
+                    <div className="relative aspect-square">
+                      <Image
+                        src={getArtworkImagePath(artwork.image)}
+                        alt={artwork.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      {artwork.isEcoFriendly && (
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="secondary" className="bg-green-600 text-white">
+                            Eco-Friendly
+                          </Badge>
                         </div>
-                        <p className="text-sm font-medium text-gray-900">${artwork.price}</p>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h2 className="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">
+                        {artwork.title}
+                      </h2>
+                      <p className="text-gray-400 mb-2">by {artwork.artist.name}</p>
+                      <p className="text-gray-300 line-clamp-2 mb-4 text-sm">
+                        {artwork.description}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-white">
+                          ₹{artwork.price.toLocaleString('en-IN')}
+                        </span>
+                        <Badge variant="outline" className="bg-gray-800 text-gray-300">
+                          {artwork.category}
+                        </Badge>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                </Link>
+              ))}
             </div>
-          </section>
-        </main>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 } 

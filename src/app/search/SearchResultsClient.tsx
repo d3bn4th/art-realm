@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { searchArtworks } from '../utils/search';
+import { formatToRupees } from '@/utils/currency';
 
 type Artwork = {
   id: number;
@@ -62,7 +63,7 @@ export default function SearchResultsClient() {
                     </h3>
                     <p className="mt-1 text-sm text-black">{artwork.artist}</p>
                   </div>
-                  <p className="text-sm font-medium text-black">${artwork.price}</p>
+                  <p className="text-sm font-medium text-black">{formatToRupees(artwork.price)}</p>
                 </div>
               </div>
             ))}

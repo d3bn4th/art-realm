@@ -1,38 +1,39 @@
 'use client';
 
-import { Fragment, useState } from 'react'
-import { Dialog, Popover, Transition } from '@headlessui/react'
-import { Bars3Icon, MagnifyingGlassIcon, ShoppingCartIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
+import { useState } from 'react';
+import { Dialog } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+
+interface CustomUser {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  role?: 'BUYER' | 'ARTIST';
+}
 
 const navigation = {
-  categories: [
-    {
-      name: 'Artwork',
-      featured: [
-        { name: 'Paintings', href: '/artwork?category=paintings' },
-        { name: 'Digital Art', href: '/artwork?category=digital' },
-        { name: 'Photography', href: '/artwork?category=photography' },
-        { name: 'Sculptures', href: '/artwork?category=sculptures' },
-      ],
+  main: [
+    { name: 'All Artworks', href: '/artwork' },
+    { name: 'Featured Artists', href: '/artists' },
+    { 
+      name: 'Eco-Friendly Art', 
+      href: '/eco-friendly',
+      icon: SparklesIcon,
+      className: 'text-green-600 hover:text-green-700'
     },
   ],
   pages: [
-    { name: 'Artists', href: '/artist' },
-    { name: 'Sell Art', href: '/artist/publish' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ],
-}
+};
 
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`
-    }
-  }
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
+  const user = session?.user as CustomUser;
 
   return (
     <header className="bg-white">
@@ -60,72 +61,65 @@ export default function Navbar() {
             </div>
 
             {/* Navigation links */}
-            <Popover.Group className="hidden lg:flex lg:gap-x-12 lg:ml-8">
-              {navigation.categories.map((category) => (
-                <Popover key={category.name} className="relative">
-                  <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-black">
-                    {category.name}
-                  </Popover.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="transition ease-in duration-150"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <Popover.Panel className="absolute top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
-                      <div className="p-4">
-                        {category.featured.map((item) => (
-                          <div
-                            key={item.name}
-                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
-                          >
-                            <div className="flex-auto">
-                              <Link href={item.href} className="block font-semibold text-black">
-                                {item.name}
-                                <span className="absolute inset-0" />
-                              </Link>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </Popover.Panel>
-                  </Transition>
-                </Popover>
+            <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center lg:gap-8">
+              {navigation.main.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`text-sm font-medium flex items-center gap-1 ${
+                    item.className || 'text-gray-700 hover:text-gray-800'
+                  }`}
+                >
+                  {item.icon && <item.icon className="h-4 w-4" />}
+                  {item.name}
+                </Link>
               ))}
-
               {navigation.pages.map((page) => (
                 <Link
                   key={page.name}
                   href={page.href}
-                  className="text-sm font-semibold leading-6 text-black"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-800"
                 >
                   {page.name}
                 </Link>
               ))}
-            </Popover.Group>
+            </div>
 
-            {/* Search and Cart */}
-            <div className="flex flex-1 items-center justify-end gap-x-6">
-              <form onSubmit={handleSearch} className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-6">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search artwork..."
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                  </div>
+            {/* Auth buttons */}
+            <div className="flex items-center">
+              {session ? (
+                <div className="flex items-center space-x-4">
+                  {user?.role === 'ARTIST' && (
+                    <Link
+                      href="/artist/dashboard"
+                      className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => signOut()}
+                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  >
+                    Sign out
+                  </button>
                 </div>
-              </form>
-              <Link href="/cart" className="p-2">
-                <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
-              </Link>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <Link
+                    href="/auth/login"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="ml-4 inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -152,18 +146,17 @@ export default function Navbar() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation.categories.map((category) => (
-                  <div key={category.name}>
-                    {category.featured.map((item) => (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+                {navigation.main.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`block px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 flex items-center gap-2 ${
+                      item.className || 'text-black'
+                    }`}
+                  >
+                    {item.icon && <item.icon className="h-5 w-5" />}
+                    {item.name}
+                  </Link>
                 ))}
                 {navigation.pages.map((page) => (
                   <Link
@@ -175,10 +168,45 @@ export default function Navbar() {
                   </Link>
                 ))}
               </div>
+              <div className="py-6">
+                {session ? (
+                  <div className="space-y-2">
+                    {user?.role === 'ARTIST' && (
+                      <Link
+                        href="/artist/dashboard"
+                        className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => signOut()}
+                      className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50 w-full text-left"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link
+                      href="/auth/login"
+                      className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50"
+                    >
+                      Register
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Dialog.Panel>
       </Dialog>
     </header>
-  )
-} 
+  );
+}

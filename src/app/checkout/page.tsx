@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { RadioGroup } from '@headlessui/react';
+import { formatToRupees } from '@/utils/currency';
 
 const deliveryMethods = [
   { id: 1, title: 'Standard', turnaround: '4–10 business days', price: 50 },
@@ -182,7 +183,7 @@ export default function Checkout() {
                                 {deliveryMethod.turnaround}
                               </RadioGroup.Description>
                               <RadioGroup.Description as="span" className="mt-6 text-sm font-medium text-gray-900">
-                                ${deliveryMethod.price}
+                                {formatToRupees(deliveryMethod.price)}
                               </RadioGroup.Description>
                             </span>
                           </span>
@@ -248,7 +249,7 @@ export default function Checkout() {
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-sm text-gray-600">Shipping</dt>
-                <dd className="text-sm font-medium text-gray-900">${selectedDeliveryMethod.price}</dd>
+                <dd className="text-sm font-medium text-gray-900">{formatToRupees(selectedDeliveryMethod.price)}</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-sm text-gray-600">Tax</dt>

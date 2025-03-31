@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeartIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { formatToRupees } from '@/utils/currency';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -68,7 +69,7 @@ export default function ArtworkDetails({ artwork, relatedArtworks }: ArtworkDeta
             </button>
           </div>
           <h2 className="sr-only">Artwork information</h2>
-          <p className="mt-2 text-3xl tracking-tight text-black">${artwork.price}</p>
+          <p className="mt-2 text-3xl tracking-tight text-black">{formatToRupees(artwork.price)}</p>
         </div>
 
         {/* Artist Info */}
@@ -139,33 +140,33 @@ export default function ArtworkDetails({ artwork, relatedArtworks }: ArtworkDeta
             and shipping. All artworks are professionally packed to ensure safe delivery.
           </p>
         </div>
-      </div>
 
-      {/* Related Artworks */}
-      {relatedArtworks.length > 0 && (
-        <div className="col-span-2 mt-20 border-t border-gray-200 pt-10">
-          <h2 className="text-2xl font-bold mb-8 text-black">Related Artworks</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {relatedArtworks.map((relatedArt) => (
-              <Link href={`/artwork/${relatedArt.id}`} key={relatedArt.id}>
-                <div className="group">
-                  <div className="relative aspect-square overflow-hidden rounded-lg">
-                    <Image
-                      src={relatedArt.image}
-                      alt={relatedArt.title}
-                      fill
-                      className="object-cover transition-transform group-hover:scale-110"
-                    />
+        {/* Related Artworks */}
+        {relatedArtworks.length > 0 && (
+          <div className="col-span-2 mt-20 border-t border-gray-200 pt-10">
+            <h2 className="text-2xl font-bold mb-8 text-black">Related Artworks</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedArtworks.map((relatedArt) => (
+                <Link href={`/artwork/${relatedArt.id}`} key={relatedArt.id}>
+                  <div className="group">
+                    <div className="relative aspect-square overflow-hidden rounded-lg">
+                      <Image
+                        src={relatedArt.image}
+                        alt={relatedArt.title}
+                        fill
+                        className="object-cover transition-transform group-hover:scale-110"
+                      />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-black">{relatedArt.title}</h3>
+                    <p className="text-gray-600">{relatedArt.artist}</p>
+                    <p className="mt-1 font-medium text-black">{formatToRupees(relatedArt.price)}</p>
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-black">{relatedArt.title}</h3>
-                  <p className="text-gray-600">{relatedArt.artist}</p>
-                  <p className="mt-1 font-medium text-black">${relatedArt.price}</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 } 

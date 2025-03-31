@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { artworks } from '../data/artworks';
+import { formatToRupees } from '@/utils/currency';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([
@@ -54,7 +55,7 @@ export default function Cart() {
                   <div className="flex-grow">
                     <h3 className="font-semibold text-black">{item.title}</h3>
                     <p className="text-black">{item.artist}</p>
-                    <p className="mt-1 text-black">${item.price}</p>
+                    <p className="mt-1 text-black">{formatToRupees(item.price)}</p>
                   </div>
                   <button
                     onClick={() => removeFromCart(item.id)}
