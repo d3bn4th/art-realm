@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 
 interface CustomUser {
   name?: string | null;
@@ -34,6 +35,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
   const user = session?.user as CustomUser;
+  const pathname = usePathname();
 
   return (
     <header className="bg-white">
@@ -67,7 +69,9 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={`text-sm font-medium flex items-center gap-1 ${
-                    item.className || 'text-gray-700 hover:text-gray-800'
+                    pathname === item.href
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-700 hover:text-gray-800'
                   }`}
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}
@@ -78,7 +82,11 @@ export default function Navbar() {
                 <Link
                   key={page.name}
                   href={page.href}
-                  className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  className={`text-sm font-medium ${
+                    pathname === page.href
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-700 hover:text-gray-800'
+                  }`}
                 >
                   {page.name}
                 </Link>
@@ -151,7 +159,7 @@ export default function Navbar() {
                     key={item.name}
                     href={item.href}
                     className={`block px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 flex items-center gap-2 ${
-                      item.className || 'text-black'
+                      pathname === item.href ? 'text-blue-600' : 'text-black'
                     }`}
                   >
                     {item.icon && <item.icon className="h-5 w-5" />}
@@ -162,7 +170,9 @@ export default function Navbar() {
                   <Link
                     key={page.name}
                     href={page.href}
-                    className="block px-3 py-2 text-base font-semibold leading-7 text-black hover:bg-gray-50"
+                    className={`block px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 ${
+                      pathname === page.href ? 'text-blue-600' : 'text-black'
+                    }`}
                   >
                     {page.name}
                   </Link>

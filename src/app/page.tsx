@@ -106,9 +106,9 @@ export default function Home() {
       {/* Featured Artworks Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
           className="flex justify-between items-center mb-12"
         >
           <h2 className="text-4xl font-bold">Featured Artworks</h2>
