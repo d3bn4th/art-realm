@@ -3,15 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(request: Request, context: Context) {
-  const { params } = context;
-  
+// Most basic format without explicit typing, following Next.js 15 examples
+export async function GET(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -43,9 +36,7 @@ export async function GET(request: Request, context: Context) {
   }
 }
 
-export async function PATCH(request: Request, context: Context) {
-  const { params } = context;
-  
+export async function PATCH(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -56,7 +47,7 @@ export async function PATCH(request: Request, context: Context) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
-    const body = await request.json();
+    const body = await req.json();
     const { name, bio, location, specialties, image } = body;
 
     const user = await prisma.user.update({

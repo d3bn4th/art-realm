@@ -1,18 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-// Using a simpler route handler format that should be compatible with Next.js 15
-export async function GET(request: Request, context: Context) {
-  const { params } = context;
-  
+// Most basic format without explicit typing, following Next.js 15 examples
+export async function GET(req, { params }) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const category = searchParams.get('category');

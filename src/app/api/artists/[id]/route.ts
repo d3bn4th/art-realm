@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function GET(request: Request, context: Context) {
-  const { params } = context;
-  
+// Most basic format without explicit typing, following Next.js 15 examples
+export async function GET(req, { params }) {
   try {
     const artist = await prisma.user.findUnique({
       where: {
