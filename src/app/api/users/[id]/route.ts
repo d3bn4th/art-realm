@@ -3,20 +3,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-interface RequestContext {
-  params: {
-    id: string;
-  };
-}
-
 export async function GET(
   request: NextRequest,
-  context: RequestContext
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: context.params.id,
+        id: params.id,
       },
     });
 
@@ -36,19 +30,19 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  context: RequestContext
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
     const data = await request.json();
 
-    if (!session || session.user.id !== context.params.id) {
+    if (!session || session.user.id !== params.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const updatedUser = await prisma.user.update({
       where: {
-        id: context.params.id,
+        id: params.id,
       },
       data,
     });
