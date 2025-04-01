@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-type Params = {
-  id: string;
-}
-
+// Next.js 15 requires this explicit typing for route params
 export async function GET(
   request: NextRequest,
-  context: { params: Params }
+  { params }: { params: { id: string } }
 ) {
   try {
     const { searchParams } = request.nextUrl;
@@ -21,7 +18,7 @@ export async function GET(
 
     // Build the where clause for filtering
     const where = {
-      artistId: context.params.id,
+      artistId: params.id,
       ...(category && { category }),
       ...(isEcoFriendly && { isEcoFriendly: true }),
     };
@@ -67,7 +64,7 @@ export async function GET(
 
     // Get all categories for filtering options
     const categories = await prisma.artwork.findMany({
-      where: { artistId: context.params.id },
+      where: { artistId: params.id },
       select: { category: true },
       distinct: ['category'],
     });
