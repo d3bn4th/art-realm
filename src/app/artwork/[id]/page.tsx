@@ -16,11 +16,15 @@ async function getArtwork(id: string) {
   return artwork;
 }
 
-export default async function ArtworkPage(props: { 
-  params: { id: string }
-}) {
-  const { id } = props.params;
-  const artwork = await getArtwork(id);
+// Update function signature to use type annotation
+type PageParams = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function ArtworkPage({ params }: PageParams) {
+  const artwork = await getArtwork(params.id);
 
   if (!artwork) {
     notFound();
