@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 
-// Component to handle search params with Suspense
-function SignInForm() {
+export default function SignIn() {
   const router = useRouter();
   const { status } = useSession();
   const searchParams = useSearchParams();
@@ -144,7 +143,7 @@ function SignInForm() {
           </div>
 
           <div className="text-center text-sm">
-            <span className="text-gray-400">Don&apos;t have an account? </span>
+            <span className="text-gray-400">Don&apost have an account? </span>
             <Link 
               href="/auth/register" 
               className="font-medium text-green-500 hover:text-green-400"
@@ -155,14 +154,5 @@ function SignInForm() {
         </form>
       </div>
     </div>
-  );
-}
-
-// Main component with Suspense boundary
-export default function SignIn() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-black text-white">Loading...</div>}>
-      <SignInForm />
-    </Suspense>
   );
 } 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
-import { authOptions } from '@/lib/auth-options';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(request: Request) {
   try {
@@ -59,18 +59,6 @@ export async function GET(request: Request) {
       ...(artistId && { artistId }),
     };
 
-    // Test database connection first
-    try {
-      await prisma.$connect();
-      console.log('Database connection successful');
-    } catch (dbError) {
-      console.error('Database connection error:', dbError);
-      return NextResponse.json(
-        { error: 'Database connection failed. Check your connection string.' },
-        { status: 500 }
-      );
-    }
-
     const artworks = await prisma.artwork.findMany({
       where,
       include: {
@@ -94,8 +82,5 @@ export async function GET(request: Request) {
       { error: 'Failed to fetch artworks' },
       { status: 500 }
     );
-  } finally {
-    // Properly disconnect to avoid connection pool issues
-    await prisma.$disconnect();
   }
 } 

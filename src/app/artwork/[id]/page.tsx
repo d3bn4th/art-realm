@@ -16,14 +16,8 @@ async function getArtwork(id: string) {
   return artwork;
 }
 
-// Next.js App Router type
-type PageProps = {
-  params: { id: string };
-  searchParams?: Record<string, string | string[] | undefined>;
-};
-
-export default async function ArtworkPage(props: PageProps) {
-  const artwork = await getArtwork(props.params.id);
+export default async function ArtworkPage({ params }: { params: { id: string } }) {
+  const artwork = await getArtwork(params.id);
 
   if (!artwork) {
     notFound();

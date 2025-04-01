@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function GET(
-  request: NextRequest,
-  { params }: any
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
-  const id = params.id;
-  
   try {
     const artist = await prisma.user.findUnique({
       where: {
-        id,
+        id: params.id,
         role: 'ARTIST',
       },
       select: {
