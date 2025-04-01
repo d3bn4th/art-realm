@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Most basic format without explicit typing, following Next.js 15 examples
-export async function GET(req, { params }) {
+// Add explicit typing to fix linter errors
+export async function GET(_: unknown, { params }: { params: { id: string } }) {
   try {
     const artist = await prisma.user.findUnique({
       where: {

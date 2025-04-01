@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-// Most basic format without explicit typing, following Next.js 15 examples
-export async function GET(req, { params }) {
+// Add explicit typing to fix linter errors
+export async function GET(_: unknown, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -36,7 +36,7 @@ export async function GET(req, { params }) {
   }
 }
 
-export async function PATCH(req, { params }) {
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
