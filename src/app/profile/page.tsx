@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -32,18 +32,7 @@ export default function ProfilePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState<ProfileData | null>(null);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-      return;
-    }
-
-    if (session?.user?.id) {
-      fetchProfileData();
-    }
-  }, [session, status, router]);
-
-  const fetchProfileData = async () => {
+  const fetchProfileData = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`);
       if (!response.ok) throw new Error('Failed to fetch profile data');
@@ -56,7 +45,18 @@ export default function ProfilePage() {
       toast.error('Failed to load profile data');
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/signin');
+      return;
+    }
+
+    if (session?.user?.id) {
+      fetchProfileData();
+    }
+  }, [session, status, router, fetchProfileData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,19 +84,26 @@ export default function ProfilePage() {
       if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
-        formData.append('upload_preset', 'art-realm');
-
-        const uploadResponse = await fetch(
-          'https://api.cloudinary.com/v1_1/your-cloud-name/image/upload',
-          {
+        
+        try {
+          const uploadResponse = await fetch('/api/upload', {
             method: 'POST',
             body: formData,
-          }
-        );
+          });
 
-        if (!uploadResponse.ok) throw new Error('Failed to upload image');
-        const uploadData = await uploadResponse.json();
-        imageUrl = uploadData.secure_url;
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            throw new Error(`Image upload failed: ${errorData.error || 'Unknown error'}`);
+          }
+          
+          const uploadData = await uploadResponse.json();
+          imageUrl = uploadData.url;
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          toast.error('Failed to upload image. Please try again.');
+          setLoading(false);
+          return;
+        }
       }
 
       const response = await fetch(`/api/users/${session?.user?.id}`, {
@@ -153,18 +160,18 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <Card className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12">
+      <Card className="max-w-3xl mx-auto bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-lg overflow-hidden border border-gray-700">
         <div className="p-8">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+            <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] bg-clip-text text-transparent">Profile</h1>
             {!isEditing ? (
               <Button
                 onClick={() => setIsEditing(true)}
                 variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 px-6 py-3 text-base bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
               >
-                <PencilIcon className="h-4 w-4" />
+                <PencilIcon className="h-5 w-5" />
                 Edit Profile
               </Button>
             ) : (
@@ -172,9 +179,9 @@ export default function ProfilePage() {
                 <Button
                   onClick={handleCancel}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 px-6 py-3 text-base bg-gray-800 text-white hover:bg-gray-700 border-gray-700"
                 >
-                  <XMarkIcon className="h-4 w-4" />
+                  <XMarkIcon className="h-5 w-5" />
                   Cancel
                 </Button>
               </div>
@@ -189,7 +196,7 @@ export default function ProfilePage() {
                     src={imagePreview || profileData.image || '/images/default-avatar.jpg'}
                     alt="Profile"
                     fill
-                    className="rounded-full object-cover border-4 border-white shadow-lg"
+                    className="rounded-full object-cover border-4 border-gray-700 shadow-xl"
                   />
                   {isEditing && (
                     <label
@@ -208,7 +215,7 @@ export default function ProfilePage() {
                   )}
                 </div>
                 {isEditing && (
-                  <p className="text-sm text-gray-500 text-center mt-2">
+                  <p className="text-sm text-gray-300 text-center mt-2">
                     Click to change profile picture
                   </p>
                 )}
@@ -217,7 +224,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Name
                 </label>
                 <Input
@@ -227,24 +234,28 @@ export default function ProfilePage() {
                     setProfileData({ ...profileData, name: e.target.value })
                   }
                   disabled={!isEditing}
-                  className={isEditing ? 'border-blue-300 focus:ring-2 focus:ring-blue-500' : ''}
+                  className={`w-full px-4 py-2 ${
+                    isEditing 
+                      ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
+                      : 'bg-gray-800 border-gray-700 text-white'
+                  } rounded-lg`}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Email
                 </label>
                 <Input
                   type="email"
                   value={profileData.email}
                   disabled
-                  className="bg-gray-50"
+                  className="w-full px-4 py-2 bg-gray-800 border-gray-700 rounded-lg text-gray-400"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Bio
                 </label>
                 <Textarea
@@ -253,14 +264,18 @@ export default function ProfilePage() {
                     setProfileData({ ...profileData, bio: e.target.value })
                   }
                   disabled={!isEditing}
-                  className={isEditing ? 'border-blue-300 focus:ring-2 focus:ring-blue-500' : ''}
+                  className={`w-full px-4 py-2 ${
+                    isEditing 
+                      ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
+                      : 'bg-gray-800 border-gray-700 text-white'
+                  } rounded-lg`}
                   rows={4}
                   placeholder={isEditing ? "Tell us about yourself..." : "No bio added yet"}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-2">
                   Location
                 </label>
                 <Input
@@ -270,14 +285,18 @@ export default function ProfilePage() {
                     setProfileData({ ...profileData, location: e.target.value })
                   }
                   disabled={!isEditing}
-                  className={isEditing ? 'border-blue-300 focus:ring-2 focus:ring-blue-500' : ''}
+                  className={`w-full px-4 py-2 ${
+                    isEditing 
+                      ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
+                      : 'bg-gray-800 border-gray-700 text-white'
+                  } rounded-lg`}
                   placeholder={isEditing ? "Enter your location" : "No location added"}
                 />
               </div>
 
               {profileData.role === 'ARTIST' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
                     Specialties
                   </label>
                   <Input
@@ -290,7 +309,11 @@ export default function ProfilePage() {
                       })
                     }
                     disabled={!isEditing}
-                    className={isEditing ? 'border-blue-300 focus:ring-2 focus:ring-blue-500' : ''}
+                    className={`w-full px-4 py-2 ${
+                      isEditing 
+                        ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
+                        : 'bg-gray-800 border-gray-700 text-white'
+                    } rounded-lg`}
                     placeholder={isEditing ? "E.g. Painting, Sculpture, Digital Art" : "No specialties added"}
                   />
                 </div>
@@ -301,7 +324,7 @@ export default function ProfilePage() {
               <div className="flex justify-end mt-8">
                 <Button
                   type="submit"
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-lg px-6 py-2 flex items-center gap-2"
                 >
                   <CheckIcon className="h-4 w-4" />
                   Save Changes

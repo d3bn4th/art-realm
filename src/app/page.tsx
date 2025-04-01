@@ -39,7 +39,33 @@ export default function Home() {
         setArtworks(data);
       } catch (error) {
         console.error('Error:', error);
-        toast.error('Failed to load artworks. Please try again later.');
+        
+        // Fallback to sample data if API fetch fails
+        try {
+          // Import sample artworks from the data file
+          import('@/app/data/artworks').then(module => {
+            // Convert the sample data to match the Artwork interface
+            const sampleArtworks = module.artworks.map(artwork => ({
+              id: artwork.id.toString(),
+              title: artwork.title,
+              description: artwork.description,
+              price: artwork.price,
+              image: artwork.image,
+              category: artwork.category,
+              isEcoFriendly: false, // Default value
+              artist: {
+                id: '1',
+                name: artwork.artist,
+                email: 'sample@example.com'
+              }
+            }));
+            setArtworks(sampleArtworks);
+            toast.success('Using sample artworks data');
+          });
+        } catch (fallbackError) {
+          console.error('Fallback error:', fallbackError);
+          toast.error('Failed to load artworks. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }

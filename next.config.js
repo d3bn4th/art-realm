@@ -5,7 +5,8 @@ const nextConfig = {
       'images.unsplash.com',
       'lh3.googleusercontent.com',
       'upload.wikimedia.org',
-      'imgur.com'
+      'imgur.com',
+      'res.cloudinary.com'
     ],
   },
 };

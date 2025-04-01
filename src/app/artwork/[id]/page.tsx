@@ -95,7 +95,7 @@ export default async function ArtworkPage({ params }: { params: { id: string } }
             </div>
 
             <div className="pt-6">
-              <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button className="h-12 w-full bg-blue-600 hover:bg-blue-700">
                 Purchase Artwork
               </Button>
             </div>

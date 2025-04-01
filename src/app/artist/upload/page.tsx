@@ -68,8 +68,13 @@ export default function UploadArtwork() {
         body: imageFormData,
       });
 
-      if (!uploadRes.ok) throw new Error('Failed to upload image');
-      const { imageUrl } = await uploadRes.json();
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json();
+        throw new Error(`Failed to upload image: ${errorData.error || 'Unknown error'}`);
+      }
+      
+      const uploadData = await uploadRes.json();
+      const imageUrl = uploadData.url; // Updated to match our Cloudinary API response
 
       // Create artwork
       const artworkData = {
