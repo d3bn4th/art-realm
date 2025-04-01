@@ -1,13 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Next.js 15 requires this explicit typing for route params
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
-    const { searchParams } = request.nextUrl;
+    const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const category = searchParams.get('category');
@@ -18,7 +17,7 @@ export async function GET(
 
     // Build the where clause for filtering
     const where = {
-      artistId: params.id,
+      artistId: context.params.id,
       ...(category && { category }),
       ...(isEcoFriendly && { isEcoFriendly: true }),
     };
@@ -64,7 +63,7 @@ export async function GET(
 
     // Get all categories for filtering options
     const categories = await prisma.artwork.findMany({
-      where: { artistId: params.id },
+      where: { artistId: context.params.id },
       select: { category: true },
       distinct: ['category'],
     });

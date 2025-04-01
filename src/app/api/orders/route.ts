@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -9,7 +9,7 @@ interface OrderItem {
   price: number;
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = request.nextUrl;
+    const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     
     // Only allow users to view their own orders, unless they're an admin (feature to be added)
