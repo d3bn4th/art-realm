@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Next.js 15 route handler
-export const GET = async (
-  request: Request,
-  { params }: { params: { id: string } }
-) => {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+// Using a simpler route handler format that should be compatible with Next.js 15
+export async function GET(request: Request, context: Context) {
+  const { params } = context;
+  
   try {
     const id = params.id;
 

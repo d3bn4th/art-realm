@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export const GET = async (
-  request: Request,
-  { params }: { params: { id: string } }
-) => {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function GET(request: Request, context: Context) {
+  const { params } = context;
+  
   try {
     const artist = await prisma.user.findUnique({
       where: {

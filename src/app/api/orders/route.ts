@@ -9,7 +9,7 @@ interface OrderItem {
   price: number;
 }
 
-export const POST = async (request: Request) => {
+export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
@@ -61,7 +61,7 @@ export const POST = async (request: Request) => {
   }
 }
 
-export const GET = async (request: Request) => {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
