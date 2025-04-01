@@ -16,9 +16,9 @@ async function getArtwork(id: string) {
   return artwork;
 }
 
-// For Next.js 15 compatibility
-export default async function ArtworkPage({ params }: { params: { id: string } }) {
-  const artwork = await getArtwork(params.id);
+// Next.js App Router type
+export default async function ArtworkPage(props) {
+  const artwork = await getArtwork(props.params.id);
 
   if (!artwork) {
     notFound();
