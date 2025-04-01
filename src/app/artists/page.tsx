@@ -98,12 +98,23 @@ export default function ArtistsPage() {
                   </div>
                 </div>
                 
-                <Link
-                  href={`/artists/${artist.id}`}
-                  className="mt-4 block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-colors"
-                >
-                  View Profile
-                </Link>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Link
+                    href={`/artists/${artist.id}`}
+                    className="text-center bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition-colors"
+                  >
+                    View Profile
+                  </Link>
+                  
+                  {artist._count.artworks > 0 && (
+                    <Link
+                      href={`/artists/${artist.id}/artworks`}
+                      className="text-center bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+                    >
+                      View Artworks
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           ))}

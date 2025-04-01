@@ -1,103 +1,171 @@
-import { notFound } from 'next/navigation';
-import prisma from '@/lib/prisma';
-import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { getArtworkImagePath } from '@/lib/utils';
+'use client';
 
-async function getArtwork(id: string) {
-  const artwork = await prisma.artwork.findUnique({
-    where: { id },
-    include: {
-      artist: true,
-      orders: true,
-    },
-  });
-  return artwork;
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import BuyButton from '@/app/components/BuyButton';
+import PriceDisplay from '@/components/ui/PriceDisplay';
+
+// Replacing Skeleton with a simple div since it's not available
+const Skeleton = ({ className }: { className: string }) => (
+  <div className={`bg-gray-700 animate-pulse ${className}`}></div>
+);
+
+interface Artwork {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  materials: string[];
+  isEcoFriendly: boolean;
+  artistId: string;
+  artist: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
-export default async function ArtworkPage({ params }: { params: { id: string } }) {
-  const artwork = await getArtwork(params.id);
+export default function ArtworkDetailPage() {
+  const params = useParams();
+  const { id } = params;
+  
+  const [artwork, setArtwork] = useState<Artwork | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!artwork) {
-    notFound();
+  useEffect(() => {
+    const fetchArtwork = async () => {
+      try {
+        const response = await fetch(`/api/artworks/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch artwork');
+        }
+        const data = await response.json();
+        setArtwork(data);
+      } catch (err) {
+        console.error('Error fetching artwork:', err);
+        setError('Failed to load artwork details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchArtwork();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="aspect-square relative">
+              <Skeleton className="w-full h-full rounded-lg" />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-6 w-1/3" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+              <Skeleton className="h-12 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !artwork) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="bg-gray-800 rounded-lg p-8 shadow-lg border border-gray-700">
+            <h1 className="text-2xl font-bold text-white mb-4">Artwork Not Found</h1>
+            <p className="text-gray-300">
+              {error || "We couldn't find the artwork you're looking for."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Artwork Image */}
-          <div className="relative aspect-square overflow-hidden rounded-lg">
-            <Image
-              src={getArtworkImagePath(artwork.image)}
+          <div className="aspect-square relative rounded-lg overflow-hidden shadow-lg border border-gray-700">
+            <Image 
+              src={artwork.image} 
               alt={artwork.title}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
             />
           </div>
 
           {/* Artwork Details */}
           <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">
+              {artwork.title}
+            </h1>
+
             <div>
-              <h1 className="text-4xl font-bold mb-2">{artwork.title}</h1>
-              <p className="text-xl text-gray-400">by {artwork.artist.name}</p>
+              <p className="text-lg text-gray-300">by <span className="text-white font-medium">{artwork.artist.name}</span></p>
             </div>
 
-            {artwork.isEcoFriendly && (
-              <Badge variant="secondary" className="bg-green-600 text-white">
-                Eco-Friendly
-              </Badge>
-            )}
+            <PriceDisplay price={artwork.price} variant="inline" size="md" />
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-2">Description</h2>
+            <div className="space-y-2">
+              <h2 className="text-xl font-medium text-white">About this artwork</h2>
               <p className="text-gray-300">{artwork.description}</p>
             </div>
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-2">Details</h2>
-              <dl className="grid grid-cols-1 gap-3 text-gray-300">
-                <div>
-                  <dt className="font-medium text-gray-400">Category</dt>
-                  <dd>{artwork.category}</dd>
-                </div>
-                <div>
-                  <dt className="font-medium text-gray-400">Materials</dt>
-                  <dd>{artwork.materials.join(', ')}</dd>
-                </div>
-                <div>
-                  <dt className="font-medium text-gray-400">Price</dt>
-                  <dd className="text-2xl font-bold text-white">
-                    ₹{artwork.price.toLocaleString('en-IN')}
-                  </dd>
-                </div>
-              </dl>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm text-gray-400">Category</h3>
+                <p className="text-white">{artwork.category}</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-400">Eco-Friendly</h3>
+                <p className="text-white">{artwork.isEcoFriendly ? 'Yes' : 'No'}</p>
+              </div>
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold mb-2">Artist</h2>
-              <div className="bg-gray-900 p-4 rounded-lg">
-                <h3 className="text-xl font-medium mb-2">{artwork.artist.name}</h3>
-                <p className="text-gray-300 mb-2">{artwork.artist.bio}</p>
-                <p className="text-gray-400">Location: {artwork.artist.location}</p>
-                <div className="mt-2">
-                  <span className="text-gray-400">Specialties: </span>
-                  {artwork.artist.specialties.map((specialty, index) => (
-                    <Badge key={index} variant="outline" className="mr-2 mt-1">
-                      {specialty}
-                    </Badge>
-                  ))}
-                </div>
+              <h3 className="text-sm text-gray-400 mb-1">Materials</h3>
+              <div className="flex flex-wrap gap-2">
+                {artwork.materials.map((material, index) => (
+                  <span 
+                    key={index}
+                    className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm border border-gray-700"
+                  >
+                    {material}
+                  </span>
+                ))}
               </div>
             </div>
 
             <div className="pt-6">
-              <Button className="h-12 w-full bg-blue-600 hover:bg-blue-700">
-                Purchase Artwork
-              </Button>
+              <BuyButton 
+                artwork={{
+                  id: artwork.id,
+                  title: artwork.title,
+                  price: artwork.price,
+                  image: artwork.image,
+                  artistId: artwork.artistId,
+                  artistName: artwork.artist.name,
+                }}
+                showQuantity
+              />
             </div>
           </div>
         </div>

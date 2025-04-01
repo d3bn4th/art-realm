@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getArtworkImagePath } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import PriceDisplay from '@/components/ui/PriceDisplay';
 
 interface Artist {
   id: string;
@@ -209,9 +210,7 @@ export default function ArtworkCatalog() {
                         {artwork.description}
                       </p>
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold text-white">
-                          ₹{artwork.price.toLocaleString('en-IN')}
-                        </span>
+                        <PriceDisplay price={artwork.price} variant="compact" size="sm" />
                         <Badge variant="outline" className="bg-gray-800 text-gray-300">
                           {artwork.category}
                         </Badge>

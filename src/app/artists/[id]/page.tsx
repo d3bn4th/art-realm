@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import PriceDisplay from '@/components/ui/PriceDisplay';
 
 interface ArtistProfile {
   id: string;
@@ -118,9 +119,19 @@ export default function ArtistProfilePage() {
         </Card>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-            Artworks by {artist.name}
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+              Artworks by {artist.name}
+            </h2>
+            {artist.artworks.length > 0 && (
+              <Link 
+                href={`/artists/${params.id}/artworks`}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              >
+                View All Artworks
+              </Link>
+            )}
+          </div>
           {artist.artworks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {artist.artworks.map((artwork) => (
@@ -138,9 +149,7 @@ export default function ArtistProfilePage() {
                       <h3 className="text-lg font-medium text-white mb-2">
                         {artwork.title}
                       </h3>
-                      <p className="text-green-400">
-                        ${artwork.price.toLocaleString()}
-                      </p>
+                      <PriceDisplay price={artwork.price} variant="compact" size="sm" />
                     </div>
                   </Card>
                 </Link>

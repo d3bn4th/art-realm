@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,18 @@ export default function ProfilePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState<ProfileData | null>(null);
 
-  const fetchProfileData = useCallback(async () => {
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/signin');
+      return;
+    }
+
+    if (session?.user?.id) {
+      fetchProfileData();
+    }
+  }, [session, status, router]);
+
+  const fetchProfileData = async () => {
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`);
       if (!response.ok) throw new Error('Failed to fetch profile data');
@@ -45,18 +56,7 @@ export default function ProfilePage() {
       toast.error('Failed to load profile data');
       setLoading(false);
     }
-  }, [session?.user?.id]);
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-      return;
-    }
-
-    if (session?.user?.id) {
-      fetchProfileData();
-    }
-  }, [session, status, router, fetchProfileData]);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,10 +160,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 py-12 px-4">
       <Card className="max-w-3xl mx-auto bg-gray-900/80 backdrop-blur-sm shadow-xl rounded-lg overflow-hidden border border-gray-700">
         <div className="p-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
             <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] bg-clip-text text-transparent">Profile</h1>
             {!isEditing ? (
               <Button
@@ -188,7 +188,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div className="flex flex-col items-center mb-8">
               <div className="relative group">
                 <div className="relative w-32 h-32">
@@ -196,12 +196,12 @@ export default function ProfilePage() {
                     src={imagePreview || profileData.image || '/images/default-avatar.jpg'}
                     alt="Profile"
                     fill
-                    className="rounded-full object-cover border-4 border-gray-700 shadow-xl"
+                    className="rounded-full object-cover border-4 border-gray-800 shadow-lg"
                   />
                   {isEditing && (
                     <label
                       htmlFor="profile-image"
-                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <CameraIcon className="h-8 w-8 text-white" />
                       <input
@@ -224,7 +224,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Name
                 </label>
                 <Input
@@ -237,13 +237,13 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 ${
                     isEditing 
                       ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
-                      : 'bg-gray-800 border-gray-700 text-white'
+                      : 'bg-gray-800 border-gray-700 text-gray-300'
                   } rounded-lg`}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Email
                 </label>
                 <Input
@@ -255,7 +255,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Bio
                 </label>
                 <Textarea
@@ -267,7 +267,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 ${
                     isEditing 
                       ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
-                      : 'bg-gray-800 border-gray-700 text-white'
+                      : 'bg-gray-800 border-gray-700 text-gray-300'
                   } rounded-lg`}
                   rows={4}
                   placeholder={isEditing ? "Tell us about yourself..." : "No bio added yet"}
@@ -275,7 +275,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Location
                 </label>
                 <Input
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                   className={`w-full px-4 py-2 ${
                     isEditing 
                       ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
-                      : 'bg-gray-800 border-gray-700 text-white'
+                      : 'bg-gray-800 border-gray-700 text-gray-300'
                   } rounded-lg`}
                   placeholder={isEditing ? "Enter your location" : "No location added"}
                 />
@@ -296,7 +296,7 @@ export default function ProfilePage() {
 
               {profileData.role === 'ARTIST' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Specialties
                   </label>
                   <Input
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                     className={`w-full px-4 py-2 ${
                       isEditing 
                         ? 'bg-gray-800 border-gray-700 focus:border-[#4ADE80] focus:ring-1 focus:ring-[#4ADE80] text-white' 
-                        : 'bg-gray-800 border-gray-700 text-white'
+                        : 'bg-gray-800 border-gray-700 text-gray-300'
                     } rounded-lg`}
                     placeholder={isEditing ? "E.g. Painting, Sculpture, Digital Art" : "No specialties added"}
                   />
