@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/[...nextauth]/auth.options';
 import prisma from '@/lib/prisma';
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: any
 ) {
+  const id = params.id;
+  
   try {
     const user = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id,
       },
     });
 
@@ -36,19 +33,21 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: any
 ) {
+  const id = params.id;
+  
   try {
     const session = await getServerSession(authOptions);
     const data = await request.json();
 
-    if (!session || session.user.id !== params.id) {
+    if (!session || session.user.id !== id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const updatedUser = await prisma.user.update({
       where: {
-        id: params.id,
+        id,
       },
       data,
     });

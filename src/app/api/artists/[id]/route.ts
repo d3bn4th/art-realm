@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: any
 ) {
+  const id = params.id;
+  
   try {
     const artist = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id,
         role: 'ARTIST',
       },
       select: {
