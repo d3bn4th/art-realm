@@ -45,7 +45,7 @@ export default function ProfilePage() {
       toast.error('Failed to load profile data');
       setLoading(false);
     }
-  }, [session?.user?.id, toast]);
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
