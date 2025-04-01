@@ -3,6 +3,12 @@ import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
+interface OrderItem {
+  id: string;
+  quantity: number;
+  price: number;
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,14 +18,14 @@ export async function POST(request: Request) {
     }
 
     const data = await request.json();
-    const { items, shipping, tax, total, shippingAddress, paymentMethod } = data;
+    const { items, total, shippingAddress } = data;
 
     if (!items || !items.length || !shippingAddress) {
       return NextResponse.json({ error: 'Invalid order data' }, { status: 400 });
     }
 
     // First, verify if all artwork items exist and are available
-    const artworkIds = items.map((item: any) => item.id);
+    const artworkIds = items.map((item: OrderItem) => item.id);
     const artworks = await prisma.artwork.findMany({
       where: {
         id: { in: artworkIds }

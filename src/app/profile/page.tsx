@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -32,18 +32,7 @@ export default function ProfilePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [originalData, setOriginalData] = useState<ProfileData | null>(null);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin');
-      return;
-    }
-
-    if (session?.user?.id) {
-      fetchProfileData();
-    }
-  }, [session, status, router]);
-
-  const fetchProfileData = async () => {
+  const fetchProfileData = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`);
       if (!response.ok) throw new Error('Failed to fetch profile data');
@@ -56,7 +45,18 @@ export default function ProfilePage() {
       toast.error('Failed to load profile data');
       setLoading(false);
     }
-  };
+  }, [session?.user?.id, toast]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/signin');
+      return;
+    }
+
+    if (session?.user?.id) {
+      fetchProfileData();
+    }
+  }, [session, status, router, fetchProfileData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
