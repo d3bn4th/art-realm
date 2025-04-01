@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+type Params = {
+  id: string;
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Params }
 ) {
   try {
     const { searchParams } = request.nextUrl;
@@ -17,7 +21,7 @@ export async function GET(
 
     // Build the where clause for filtering
     const where = {
-      artistId: params.id,
+      artistId: context.params.id,
       ...(category && { category }),
       ...(isEcoFriendly && { isEcoFriendly: true }),
     };
@@ -63,7 +67,7 @@ export async function GET(
 
     // Get all categories for filtering options
     const categories = await prisma.artwork.findMany({
-      where: { artistId: params.id },
+      where: { artistId: context.params.id },
       select: { category: true },
       distinct: ['category'],
     });

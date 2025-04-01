@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const userId = searchParams.get('userId');
     
     // Only allow users to view their own orders, unless they're an admin (feature to be added)
