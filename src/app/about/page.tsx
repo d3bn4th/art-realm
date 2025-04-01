@@ -103,7 +103,7 @@ export default function AboutPage() {
             {[
               {
                 name: 'Lalith (Ampavathina) Rahul',
-                role: 'Founder & CEO',
+                role: 'Chairman & CEO',
                 imageUrl: '/images/team/rahul.jpeg'
               },
               {

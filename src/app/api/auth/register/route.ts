@@ -6,12 +6,20 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name, role } = await request.json();
+    const { email, password, name, role, bio } = await request.json();
 
     // Validate input
     if (!email || !password || !name || !role) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Additional validation for artists
+    if (role === 'ARTIST' && !bio) {
+      return NextResponse.json(
+        { error: 'Artist bio is required' },
         { status: 400 }
       );
     }
@@ -37,17 +45,18 @@ export async function POST(request: Request) {
         email,
         password: hashedPassword,
         name,
-        role: role as 'BUYER' | 'ARTIST'
+        role: role as 'BUYER' | 'ARTIST',
+        bio: role === 'ARTIST' ? bio : null,
       }
     });
 
+    // Remove password from response
+    const { password: _unused, ...userWithoutPassword } = user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _ = _unused;
+
     return NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role
-      }
+      user: userWithoutPassword
     });
   } catch (error) {
     console.error('Registration error:', error);

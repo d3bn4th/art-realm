@@ -1,26 +1,27 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
 // This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
-  // Get the token from the request headers
-  const token = request.headers.get('authorization')?.split(' ')[1];
+export async function middleware(request: NextRequest) {
+  const session = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
   // Check if the request is for an authenticated route
   if (request.nextUrl.pathname.startsWith('/artist/dashboard') ||
       request.nextUrl.pathname.startsWith('/api/artist')) {
     
-    // If no token is present, redirect to login
-    if (!token) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+    // If no session is present, redirect to signin
+    if (!session) {
+      const signinUrl = new URL('/auth/signin', request.url);
+      signinUrl.searchParams.set('callbackUrl', request.url);
+      return NextResponse.redirect(signinUrl);
     }
 
-    // In a real application, you would:
-    // 1. Verify the JWT token
-    // 2. Check user permissions
-    // 3. Handle token expiration
+    // Check if the user is an artist
+    if (session.role !== 'ARTIST') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
 
-    // For now, we'll just check if the token exists
     return NextResponse.next();
   }
 

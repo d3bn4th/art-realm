@@ -14,7 +14,8 @@ const artworkImages = {
   'Digital Forest Symphony': '/images/artworks/digital-forest.jpg',
   'Upcycled Dreams': '/images/artworks/upcycled-dreams.jpg',
   "Nature's Palette": '/images/artworks/natures-palette.jpg',
-  'Sustainable Horizons': '/images/artworks/sustainable-horizons.jpg'
+  'Sustainable Horizons': '/images/artworks/sustainable-horizons.jpg',
+  "Twin Birds" : '/images/artworks/twin-birds.jpg'
 };
 
 // Define user profile images
@@ -23,6 +24,7 @@ const userImages = {
   frida: '/images/profiles/frida.jpg',
   john: '/images/profiles/john.jpg',
   sarah: '/images/profiles/sarah.jpg',
+  rahul: '/images/profiles/rahul.jpg'
 };
 
 async function main() {
@@ -57,6 +59,20 @@ async function main() {
       image: userImages.frida,
     },
   });
+
+  const artist3 = await prisma.user.create({
+    data: {
+      email: 'rahul@example.com',
+      name: 'Lalith Rahul',
+      password: await bcrypt.hash('password123', 10),
+      role: UserRole.ARTIST,
+      bio: 'Indian Artists creating awe inspiring artwords of religious figures',
+      location: 'India',
+      specialties: ['Paitings', 'Sketches', 'Sculptures'],
+      image: userImages.frida,
+    },
+  });
+  
 
   // Create sample buyers
   const buyer1 = await prisma.user.create({
@@ -213,6 +229,18 @@ async function main() {
       artistId: artist2.id,
     },
   });
+  const artwork11 = await prisma.artwork.create({
+    data: {
+      title: 'Twin Birds',
+      description: 'The bloody moon night shared between two birds',
+      price: 920000,
+      category: 'Installation',
+      image: artworkImages['Sustainable Horizons'],
+      isEcoFriendly: true,
+      materials: ['Recycled Paints and Canvas'],
+      artistId: artist3.id,
+    },
+  });
 
   // Create sample orders
   await prisma.order.create({
@@ -304,6 +332,14 @@ async function main() {
       totalAmount: 920000,
       buyerId: buyer2.id,
       artworkId: artwork10.id,
+    },
+  });
+  await prisma.order.create({
+    data: {
+      status: 'completed',
+      totalAmount: 920000,
+      buyerId: buyer2.id,
+      artworkId: artwork11.id,
     },
   });
 

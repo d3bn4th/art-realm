@@ -1,3 +1,4 @@
+import 'next-auth';
 import { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
@@ -5,11 +6,10 @@ declare module 'next-auth' {
     user: {
       id: string;
       role: 'ARTIST' | 'BUYER';
-    } & DefaultSession['user'];
+    } & DefaultSession['user']
   }
 
   interface User {
-    id: string;
     role: 'ARTIST' | 'BUYER';
   }
 } 

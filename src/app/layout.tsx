@@ -5,7 +5,6 @@ import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import Providers from "./providers";
 import { Toaster } from 'react-hot-toast';
-import { SessionProvider } from '@/components/SessionProvider';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]/route';
 
@@ -26,18 +25,16 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionProvider session={session}>
-          <Providers>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
-          </Providers>
+        <Providers>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
           <Toaster position="bottom-right" />
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );

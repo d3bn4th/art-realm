@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatToRupees } from '@/utils/currency';
 import { motion } from 'framer-motion';
-import { heroBackground } from '@/app/data/images';
 
 interface Artist {
   id: string;
@@ -60,48 +59,187 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
       {/* Hero Section */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="relative h-[50vh] flex items-center justify-center overflow-hidden"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${heroBackground})` }}
-        />
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <motion.h1 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500"
-          >
-            Where Art Meets Sustainability
-          </motion.h1>
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-xl md:text-2xl text-gray-300 mb-8"
-          >
-            Experience extraordinary artworks crafted with love for both creativity and our planet
-          </motion.p>
+      <div className="relative h-[80vh] overflow-hidden">
+        {/* Container for the animated images */}
+        <div className="relative w-full h-full">
+          {/* Center Image */}
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="flex justify-center gap-4"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.7 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/4 h-1/4 z-20"
           >
-            <Link 
-              href="/eco-friendly"
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full transition-all transform hover:scale-105"
-            >
-              Explore Eco-Friendly Art
-            </Link>
+            {/* <Image
+              src="/images/hero/center-image.jpg"
+              alt="Central Art"
+              fill
+              className="object-cover rounded-full"
+              priority
+            /> */}
           </motion.div>
+
+          {/* Left Image */}
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 0.7 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-2/3"
+          >
+            <Image
+              src="/images/hero/left-image.jpg"
+              alt="Sustainable Art"
+              fill
+              className="object-cover rounded-tr-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Top Image */}
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-2/3"
+          >
+            <Image
+              src="/images/hero/top-image.jpg"
+              alt="Eco Art"
+              fill
+              className="object-cover rounded-b-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Right Image */}
+          <motion.div
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 0.9 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-2/3"
+          >
+            <Image
+              src="/images/hero/right-image.jpg"
+              alt="Nature Art"
+              fill
+              className="object-cover rounded-tl-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Top Left Corner Image */}
+          <motion.div
+            initial={{ x: -100, y: -100, opacity: 0 }}
+            animate={{ x: 0, y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.4, ease: "easeOut", delay: 0.6 }}
+            className="absolute left-[10%] top-[10%] w-1/4 h-1/4"
+          >
+            <Image
+              src="/images/hero/top-left-image.jpg"
+              alt="Eco-friendly Creation"
+              fill
+              className="object-cover rounded-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Top Right Corner Image */}
+          <motion.div
+            initial={{ x: 100, y: -100, opacity: 0 }}
+            animate={{ x: 0, y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.4, ease: "easeOut", delay: 0.7 }}
+            className="absolute right-[10%] top-[10%] w-1/4 h-1/4"
+          >
+            <Image
+              src="/images/hero/top-right-image.jpg"
+              alt="Natural Materials"
+              fill
+              className="object-cover rounded-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Bottom Left Corner Image */}
+          <motion.div
+            initial={{ x: -100, y: 100, opacity: 0 }}
+            animate={{ x: 0, y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.4, ease: "easeOut", delay: 0.8 }}
+            className="absolute left-[10%] bottom-[10%] w-1/4 h-1/4"
+          >
+            <Image
+              src="/images/hero/bottom-left-image.jpg"
+              alt="Recycled Art"
+              fill
+              className="object-cover rounded-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Bottom Right Corner Image */}
+          <motion.div
+            initial={{ x: 100, y: 100, opacity: 0 }}
+            animate={{ x: 0, y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.4, ease: "easeOut", delay: 0.9 }}
+            className="absolute right-[10%] bottom-[10%] w-1/4 h-1/4"
+          >
+            <Image
+              src="/images/hero/bottom-right-image.jpg"
+              alt="Sustainable Design"
+              fill
+              className="object-cover rounded-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Bottom Center Image */}
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 0.7 }}
+            transition={{ duration: 1.4, ease: "easeOut", delay: 1.0 }}
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/4 h-1/3"
+          >
+            <Image
+              src="/images/hero/center.jpg"
+              alt="Earth-friendly Art"
+              fill
+              className="object-cover rounded-t-3xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
         </div>
-      </motion.div>
+
+        {/* Content */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1.4 }}
+          className="absolute inset-0 z-30 flex items-center justify-center"
+        >
+          <div className="text-center px-4 max-w-4xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+              Where Art Meets Sustainability
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 mb-8">
+              Experience extraordinary artworks crafted with love for both creativity and our planet
+            </p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.9 }}
+              className="flex justify-center gap-4"
+            >
+              <Link 
+                href="/eco-friendly"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full transition-all transform hover:scale-105"
+              >
+                Explore Eco-Friendly Art
+              </Link>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Featured Artworks Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
