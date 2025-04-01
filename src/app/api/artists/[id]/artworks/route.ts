@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET(
+// Next.js 15 route handler
+export const GET = async (
   request: Request,
-  context: { params: { id: string } }
-) {
+  { params }: { params: { id: string } }
+) => {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -17,7 +18,7 @@ export async function GET(
 
     // Build the where clause for filtering
     const where = {
-      artistId: context.params.id,
+      artistId: params.id,
       ...(category && { category }),
       ...(isEcoFriendly && { isEcoFriendly: true }),
     };
@@ -63,7 +64,7 @@ export async function GET(
 
     // Get all categories for filtering options
     const categories = await prisma.artwork.findMany({
-      where: { artistId: context.params.id },
+      where: { artistId: params.id },
       select: { category: true },
       distinct: ['category'],
     });

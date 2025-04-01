@@ -3,10 +3,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-export async function GET(
+export const GET = async (
   request: Request,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -38,10 +38,10 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+export const PATCH = async (
   request: Request,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {

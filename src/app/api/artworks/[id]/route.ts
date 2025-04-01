@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Next.js 15 requires this explicit typing for route params
-export async function GET(
+// Next.js 15 route handler
+export const GET = async (
   request: Request,
-  context: { params: { id: string } }
-) {
+  { params }: { params: { id: string } }
+) => {
   try {
-    const id = context.params.id;
+    const id = params.id;
 
     const artwork = await prisma.artwork.findUnique({
       where: {

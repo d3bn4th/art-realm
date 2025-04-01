@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET(
+export const GET = async (
   request: Request,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const artist = await prisma.user.findUnique({
       where: {
