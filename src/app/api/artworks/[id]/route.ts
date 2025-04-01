@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
 export async function GET(
   request: Request,
-  context: Params
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
 
     const artwork = await prisma.artwork.findUnique({
       where: {
