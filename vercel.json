@@ -8,7 +8,7 @@
   "buildCommand": "next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
-  "framework": "next",
+  "framework": "nextjs",
   "env": {
     "NEXT_PRIVATE_STANDALONE": "true"
   }
