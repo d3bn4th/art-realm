@@ -16,8 +16,11 @@ async function getArtwork(id: string) {
   return artwork;
 }
 
-export default async function ArtworkPage({ params }: { params: { id: string } }) {
-  const artwork = await getArtwork(params.id);
+export default async function ArtworkPage(props: { 
+  params: { id: string }
+}) {
+  const { id } = props.params;
+  const artwork = await getArtwork(id);
 
   if (!artwork) {
     notFound();

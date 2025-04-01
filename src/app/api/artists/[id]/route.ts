@@ -1,14 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+interface RequestContext {
+  params: {
+    id: string;
+  };
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RequestContext
 ) {
   try {
     const artist = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id: context.params.id,
         role: 'ARTIST',
       },
       select: {

@@ -1,84 +1,64 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
+interface RequestContext {
+  params: {
+    id: string;
+  };
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RequestContext
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        bio: true,
-        location: true,
-        specialties: true,
-        image: true,
-        role: true,
+      where: {
+        id: context.params.id,
       },
     });
 
     if (!user) {
-      return new NextResponse('User not found', { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
     console.error('Error fetching user:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch user' },
+      { status: 500 }
+    );
   }
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RequestContext
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    const data = await request.json();
+
+    if (!session || session.user.id !== context.params.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (session.user.id !== params.id) {
-      return new NextResponse('Forbidden', { status: 403 });
-    }
-
-    const body = await request.json();
-    const { name, bio, location, specialties, image } = body;
-
-    const user = await prisma.user.update({
-      where: { id: params.id },
-      data: {
-        name,
-        bio,
-        location,
-        specialties,
-        image,
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: context.params.id,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        bio: true,
-        location: true,
-        specialties: true,
-        image: true,
-        role: true,
-      },
+      data,
     });
 
-    return NextResponse.json(user);
+    return NextResponse.json(updatedUser);
   } catch (error) {
     console.error('Error updating user:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update user' },
+      { status: 500 }
+    );
   }
 } 
