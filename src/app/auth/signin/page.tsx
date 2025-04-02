@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 
-export default function SignIn() {
+// Component to handle search params
+function SignInForm() {
   const router = useRouter();
   const { status } = useSession();
   const searchParams = useSearchParams();
@@ -143,7 +144,7 @@ export default function SignIn() {
           </div>
 
           <div className="text-center text-sm">
-            <span className="text-gray-400">Don&apost have an account? </span>
+            <span className="text-gray-400">Don&apos;t have an account? </span>
             <Link 
               href="/auth/register" 
               className="font-medium text-green-500 hover:text-green-400"
@@ -154,5 +155,14 @@ export default function SignIn() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black text-white">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 } 

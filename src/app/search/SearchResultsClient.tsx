@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { searchArtworks } from '../utils/search';
@@ -17,7 +17,8 @@ type Artwork = {
   description: string;
 };
 
-export default function SearchResultsClient() {
+// Component that uses useSearchParams
+function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<Artwork[]>([]);
@@ -71,5 +72,36 @@ export default function SearchResultsClient() {
         )}
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function SearchResultsClient() {
+  return (
+    <Suspense fallback={
+      <div className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-64 mb-8"></div>
+            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="group relative">
+                  <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200"></div>
+                  <div className="mt-4 flex justify-between">
+                    <div>
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      <div className="mt-1 h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded w-12"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <SearchResults />
+    </Suspense>
   );
 } 
