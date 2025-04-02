@@ -28,6 +28,7 @@ model User {
   artworks  Artwork[]
   orders    Order[]
   ratings   Rating[]
+  bids      Bid[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -45,6 +46,7 @@ model Artwork {
   artistId     String
   orders       Order[]
   ratings      Rating[]
+  auction      Auction?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -83,4 +85,28 @@ model Rating {
 
   // Ensure a user can only rate an artwork once
   @@unique([userId, artworkId])
+}
+
+model Auction {
+  id              String    @id @default(cuid())
+  startTime       DateTime
+  endTime         DateTime
+  startingPrice   Float
+  currentPrice    Float
+  status          String    // active, ended, cancelled
+  artwork         Artwork   @relation(fields: [artworkId], references: [id])
+  artworkId       String    @unique  // One artwork can only be in one auction
+  bids            Bid[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Bid {
+  id          String   @id @default(cuid())
+  amount      Float
+  bidder      User     @relation(fields: [bidderId], references: [id])
+  bidderId    String
+  auction     Auction  @relation(fields: [auctionId], references: [id])
+  auctionId   String
+  createdAt   DateTime @default(now())
 } 

@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon, SparklesIcon, UserCircleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, SparklesIcon, UserCircleIcon, ChevronDownIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
+import { useCart } from '@/app/context/CartContext';
 
 interface CustomUser {
   name?: string | null;
@@ -21,6 +22,7 @@ const navigation = {
   main: [
     { name: 'All Artworks', href: '/artwork' },
     { name: 'Featured Artists', href: '/artists' },
+    { name: 'Auctions', href: '/auctions' },
     { 
       name: 'Eco-Friendly Art', 
       href: '/eco-friendly',
@@ -45,6 +47,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const user = session?.user as CustomUser;
   const pathname = usePathname();
+  const { cart } = useCart();
 
   const handleSignOut = () => {
     signOut({
@@ -118,6 +121,16 @@ export default function Navbar() {
 
             {/* Auth buttons */}
             <div className="flex items-center">
+              {/* Cart Button */}
+              <Link href="/cart" className="mr-4 p-1 relative text-gray-700 hover:text-gray-800">
+                <ShoppingCartIcon className="h-6 w-6" />
+                {cart.items.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cart.items.length}
+                  </span>
+                )}
+              </Link>
+              
               {status === 'authenticated' && session ? (
                 <div className="flex items-center space-x-4">
                   {/* User Profile Dropdown */}
@@ -223,6 +236,15 @@ export default function Navbar() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
+                {/* Add Cart Link to Mobile Menu */}
+                <Link
+                  href="/cart"
+                  className="block px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 flex items-center gap-2 text-black"
+                >
+                  <ShoppingCartIcon className="h-5 w-5" />
+                  Cart {cart.items.length > 0 && `(${cart.items.length})`}
+                </Link>
+                
                 {navigation.main.map((item) => (
                   <Link
                     key={item.name}

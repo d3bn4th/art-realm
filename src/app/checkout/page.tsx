@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { RadioGroup } from '@headlessui/react';
@@ -48,9 +48,15 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
 
-  // Redirect to cart if cart is empty
+  // Use useEffect to handle redirect
+  useEffect(() => {
+    if (cart.items.length === 0 && !orderComplete) {
+      router.push('/cart');
+    }
+  }, [cart.items.length, orderComplete, router]);
+
+  // If cart is empty, render nothing until redirect happens
   if (cart.items.length === 0 && !orderComplete) {
-    router.push('/cart');
     return null;
   }
 
