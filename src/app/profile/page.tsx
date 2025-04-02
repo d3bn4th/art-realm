@@ -34,15 +34,29 @@ export default function ProfilePage() {
 
   const fetchProfileData = useCallback(async () => {
     try {
-      const response = await fetch(`/api/users/${session?.user?.id}`);
-      if (!response.ok) throw new Error('Failed to fetch profile data');
+      if (!session?.user?.id) {
+        console.error('No user ID available in session');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Fetching profile data for user ID:', session.user.id);
+      const response = await fetch(`/api/users/${session.user.id}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API Error (${response.status}):`, errorText);
+        throw new Error(`Failed to fetch profile data: ${response.status} - ${errorText}`);
+      }
+      
       const data = await response.json();
+      console.log('Profile data fetched successfully');
       setProfileData(data);
       setOriginalData(data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching profile data:', error);
-      toast.error('Failed to load profile data');
+      toast.error(`Failed to load profile data: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setLoading(false);
     }
   }, [session?.user?.id]);
@@ -79,6 +93,7 @@ export default function ProfilePage() {
     if (!profileData) return;
 
     try {
+      setLoading(true);
       let imageUrl = profileData.image;
 
       if (imageFile) {
@@ -86,26 +101,30 @@ export default function ProfilePage() {
         formData.append('file', imageFile);
         
         try {
+          console.log('Uploading profile image');
           const uploadResponse = await fetch('/api/upload', {
             method: 'POST',
             body: formData,
           });
 
           if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json();
-            throw new Error(`Image upload failed: ${errorData.error || 'Unknown error'}`);
+            const errorText = await uploadResponse.text();
+            console.error(`Image upload failed (${uploadResponse.status}):`, errorText);
+            throw new Error(`Image upload failed: ${uploadResponse.status} - ${errorText}`);
           }
           
           const uploadData = await uploadResponse.json();
           imageUrl = uploadData.url;
+          console.log('Image uploaded successfully');
         } catch (uploadError) {
           console.error('Image upload error:', uploadError);
-          toast.error('Failed to upload image. Please try again.');
+          toast.error(`Failed to upload image: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
           setLoading(false);
           return;
         }
       }
 
+      console.log('Updating profile for user ID:', session?.user?.id);
       const response = await fetch(`/api/users/${session?.user?.id}`, {
         method: 'PATCH',
         headers: {
@@ -117,15 +136,23 @@ export default function ProfilePage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to update profile');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Profile update failed (${response.status}):`, errorText);
+        throw new Error(`Failed to update profile: ${response.status} - ${errorText}`);
+      }
+
       const updatedData = await response.json();
       setProfileData(updatedData);
       setOriginalData(updatedData);
       setIsEditing(false);
       toast.success('Profile updated successfully');
+      console.log('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      toast.error(`Failed to update profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 

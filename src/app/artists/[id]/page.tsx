@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import PriceDisplay from '@/components/ui/PriceDisplay';
+import ArtworkCard from '@/components/ArtworkCard';
+import StarRating from '@/components/ui/StarRating';
 
 interface ArtistProfile {
   id: string;
@@ -27,6 +28,8 @@ export default function ArtistProfilePage() {
   const params = useParams();
   const [artist, setArtist] = useState<ArtistProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -35,6 +38,33 @@ export default function ArtistProfilePage() {
         if (!response.ok) throw new Error('Failed to fetch artist data');
         const data = await response.json();
         setArtist(data);
+        
+        // Calculate average artist rating if they have artworks
+        if (data.artworks && data.artworks.length > 0) {
+          let ratingSum = 0;
+          let ratingCount = 0;
+          
+          // Fetch ratings for each artwork
+          for (const artwork of data.artworks) {
+            try {
+              const ratingResponse = await fetch(`/api/artworks/${artwork.id}/rating`);
+              if (ratingResponse.ok) {
+                const ratingData = await ratingResponse.json();
+                if (ratingData.totalRatings > 0) {
+                  ratingSum += ratingData.averageRating * ratingData.totalRatings;
+                  ratingCount += ratingData.totalRatings;
+                }
+              }
+            } catch (error) {
+              console.error(`Error fetching rating for artwork ${artwork.id}:`, error);
+            }
+          }
+          
+          if (ratingCount > 0) {
+            setAverageRating(parseFloat((ratingSum / ratingCount).toFixed(1)));
+            setTotalRatings(ratingCount);
+          }
+        }
       } catch (error) {
         console.error('Error fetching artist data:', error);
       } finally {
@@ -94,6 +124,19 @@ export default function ArtistProfilePage() {
               <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
                 {artist.name}
               </h1>
+              
+              {/* Artist Rating */}
+              {totalRatings > 0 && (
+                <div className="mb-4">
+                  <div className="flex items-center">
+                    <StarRating rating={averageRating} readonly showValue />
+                    <span className="ml-2 text-gray-400">
+                      ({totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'})
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               {artist.specialties.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {artist.specialties.map((specialty, index) => (
@@ -134,25 +177,21 @@ export default function ArtistProfilePage() {
           </div>
           {artist.artworks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {artist.artworks.map((artwork) => (
-                <Link href={`/artwork/${artwork.id}`} key={artwork.id}>
-                  <Card className="group bg-gray-900 border-gray-800 overflow-hidden">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={artwork.image}
-                        alt={artwork.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-medium text-white mb-2">
-                        {artwork.title}
-                      </h3>
-                      <PriceDisplay price={artwork.price} variant="compact" size="sm" />
-                    </div>
-                  </Card>
-                </Link>
+              {artist.artworks.slice(0, 6).map((artwork) => (
+                <ArtworkCard
+                  key={artwork.id}
+                  artwork={{
+                    id: artwork.id,
+                    title: artwork.title,
+                    price: artwork.price,
+                    image: artwork.image,
+                    artist: {
+                      id: artist.id,
+                      name: artist.name,
+                    }
+                  }}
+                  showArtist={false}
+                />
               ))}
             </div>
           ) : (

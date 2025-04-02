@@ -27,6 +27,7 @@ model User {
   specialties String[]
   artworks  Artwork[]
   orders    Order[]
+  ratings   Rating[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -43,18 +44,43 @@ model Artwork {
   artist       User     @relation(fields: [artistId], references: [id])
   artistId     String
   orders       Order[]
+  ratings      Rating[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
 model Order {
-  id          String   @id @default(cuid())
-  status      String   // pending, completed, cancelled
-  totalAmount Float
-  buyer       User     @relation(fields: [buyerId], references: [id])
-  buyerId     String
-  artwork     Artwork  @relation(fields: [artworkId], references: [id])
-  artworkId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  status              String    // pending, completed, shipping, cancelled
+  totalAmount         Float
+  shippingAddress     String?   // JSON string containing address details
+  shippingMethod      String?
+  trackingNumber      String?
+  shippingDate        DateTime?
+  expectedDeliveryDate DateTime?
+  deliveryDate        DateTime?
+  paymentMethod       String?
+  paymentId           String?
+  paymentStatus       String?
+  paymentDate         DateTime?
+  buyer               User      @relation(fields: [buyerId], references: [id])
+  buyerId             String
+  artwork             Artwork   @relation(fields: [artworkId], references: [id])
+  artworkId           String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  value     Int      // Rating value (1-5)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  artwork   Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Ensure a user can only rate an artwork once
+  @@unique([userId, artworkId])
 } 

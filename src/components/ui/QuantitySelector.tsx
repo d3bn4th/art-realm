@@ -51,24 +51,30 @@ export default function QuantitySelector({
 
   // Size-dependent styles
   const iconClasses = {
-    sm: 'h-3 w-3',
-    md: 'h-4 w-4',
-    lg: 'h-5 w-5',
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6',
   };
 
   const inputClasses = {
-    sm: 'w-10 text-sm',
-    md: 'w-12 text-base',
-    lg: 'w-14 text-lg',
+    sm: 'w-12 text-sm',
+    md: 'w-16 text-base',
+    lg: 'w-20 text-lg font-bold',
+  };
+
+  const buttonClasses = {
+    sm: 'h-8',
+    md: 'h-10',
+    lg: 'h-12',
   };
 
   return (
-    <div className="flex items-stretch">
+    <div className="flex items-stretch rounded-lg overflow-hidden shadow-lg border border-gray-700">
       <button 
         type="button"
         onClick={handleDecrease}
         disabled={value <= min}
-        className="flex-1 flex items-center justify-center rounded-l-md bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:hover:bg-gray-800"
+        className={`${buttonClasses[size]} flex-1 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-500 hover:to-blue-600 active:from-blue-700 active:to-blue-800 transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:hover:bg-blue-800 shadow-inner`}
         aria-label="Decrease quantity"
       >
         <MinusIcon className={iconClasses[size]} />
@@ -78,7 +84,7 @@ export default function QuantitySelector({
         type="text"
         value={value}
         onChange={handleInputChange}
-        className={`${inputClasses[size]} bg-gray-900 border-t border-b border-gray-700 text-center text-white focus:outline-none focus:ring-1 focus:ring-blue-500`}
+        className={`${inputClasses[size]} bg-black text-center text-white focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold`}
         aria-label="Quantity"
       />
       
@@ -86,7 +92,7 @@ export default function QuantitySelector({
         type="button"
         onClick={handleIncrease}
         disabled={value >= max}
-        className="flex-1 flex items-center justify-center rounded-r-md bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:hover:bg-gray-800"
+        className={`${buttonClasses[size]} flex-1 flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-500 hover:to-blue-600 active:from-blue-700 active:to-blue-800 transition-colors disabled:opacity-50 disabled:pointer-events-none disabled:hover:bg-blue-800 shadow-inner`}
         aria-label="Increase quantity"
       >
         <PlusIcon className={iconClasses[size]} />

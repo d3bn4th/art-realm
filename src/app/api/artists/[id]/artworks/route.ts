@@ -4,6 +4,9 @@ import prisma from '@/lib/prisma';
 // Add explicit typing to fix linter errors
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    // Extract the ID early to avoid errors
+    const artistId = params.id;
+    
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
@@ -15,7 +18,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     // Build the where clause for filtering
     const where = {
-      artistId: params.id,
+      artistId,
       ...(category && { category }),
       ...(isEcoFriendly && { isEcoFriendly: true }),
     };
@@ -61,7 +64,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     // Get all categories for filtering options
     const categories = await prisma.artwork.findMany({
-      where: { artistId: params.id },
+      where: { artistId },
       select: { category: true },
       distinct: ['category'],
     });

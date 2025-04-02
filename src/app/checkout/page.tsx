@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { formatToRupees } from '@/utils/currency';
 
+// Define a class for input fields to ensure consistency
+const inputClassName = "block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 h-12";
+
 const deliveryMethods = [
   { id: 1, title: 'Standard', turnaround: '4–10 business days', price: 50 },
   { id: 2, title: 'Express', turnaround: '2–5 business days', price: 80 },
@@ -170,7 +173,7 @@ export default function Checkout() {
                     onChange={handleInputChange}
                     autoComplete="email"
                     required
-                    className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className={inputClassName}
                   />
                 </div>
               </div>
@@ -187,7 +190,7 @@ export default function Checkout() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     autoComplete="tel"
-                    className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    className={inputClassName}
                   />
                 </div>
               </div>
@@ -211,7 +214,7 @@ export default function Checkout() {
                       name="company"
                       value={formData.company}
                       onChange={handleInputChange}
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -229,7 +232,7 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       autoComplete="given-name"
                       required
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -247,7 +250,7 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       autoComplete="family-name"
                       required
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -265,7 +268,7 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       autoComplete="street-address"
                       required
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -283,7 +286,7 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       autoComplete="address-level2"
                       required
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -301,7 +304,7 @@ export default function Checkout() {
                       onChange={handleInputChange}
                       autoComplete="postal-code"
                       required
-                      className="block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -325,7 +328,7 @@ export default function Checkout() {
                         classNames(
                           checked ? 'border-transparent' : 'border-gray-700',
                           active ? 'ring-2 ring-blue-500' : '',
-                          'relative flex cursor-pointer rounded-lg border bg-gray-800 p-4 shadow-sm focus:outline-none'
+                          'relative flex cursor-pointer rounded-lg border bg-gray-800 p-5 shadow-sm focus:outline-none'
                         )
                       }
                     >
@@ -454,9 +457,17 @@ export default function Checkout() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-md py-3"
+                className="w-full rounded-md border border-transparent bg-gradient-to-r from-green-600 to-blue-600 py-3 h-14 px-4 text-base font-medium text-white shadow-sm hover:from-green-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 flex items-center justify-center"
               >
-                {isSubmitting ? 'Processing...' : 'Complete Order'}
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : 'Complete Order'}
               </Button>
             </div>
           </section>

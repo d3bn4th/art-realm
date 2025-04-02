@@ -178,7 +178,7 @@ export default function ArtistDashboard() {
                 ))}
               </div>
               <Link
-                href="/artist/orders"
+                href="/artist/sales"
                 className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500"
               >
                 View all orders →
@@ -210,7 +210,7 @@ export default function ArtistDashboard() {
                 ))}
               </div>
               <Link
-                href="/artist/artworks"
+                href={`/artists/${session.user.id}/artworks`}
                 className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-500"
               >
                 View all artworks →

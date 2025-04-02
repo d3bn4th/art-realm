@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Add explicit typing to fix linter errors
+// Fix the params handling for Next.js
 export async function GET(_: unknown, { params }: { params: { id: string } }) {
   try {
+    // Ensure params is used after awaiting any promises
+    const id = params.id;
+    
     const artist = await prisma.user.findUnique({
       where: {
-        id: params.id,
+        id,
         role: 'ARTIST',
       },
       select: {

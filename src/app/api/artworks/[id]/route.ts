@@ -4,11 +4,12 @@ import prisma from '@/lib/prisma';
 // Add explicit typing to fix linter errors
 export async function GET(_: unknown, { params }: { params: { id: string } }) {
   try {
+    // Extract ID early to avoid errors
     const id = params.id;
 
     const artwork = await prisma.artwork.findUnique({
       where: {
-        id: id,
+        id,
       },
       include: {
         artist: {

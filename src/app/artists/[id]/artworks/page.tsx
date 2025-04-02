@@ -79,7 +79,8 @@ function ArtworksList() {
     
     // Update params based on provided filters
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === false || value === '') {
+      // Special handling for 'all' category value - remove the parameter
+      if ((key === 'category' && value === 'all') || value === false || value === '') {
         params.delete(key);
       } else {
         params.set(key, String(value));
@@ -170,14 +171,14 @@ function ArtworksList() {
             <div>
               <Label htmlFor="category">Category</Label>
               <Select 
-                value={category} 
+                value={category || 'all'} 
                 onValueChange={(value: string) => updateFilters({ category: value })}
               >
                 <SelectTrigger id="category" className="bg-gray-800 border-gray-700">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}

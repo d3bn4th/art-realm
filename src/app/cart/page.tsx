@@ -87,7 +87,7 @@ export default function Cart() {
                             }
                           }}
                           min={1}
-                          size="sm"
+                          size="md"
                         />
                         <div className="ml-auto text-right">
                           <span className="text-gray-400 text-sm">Subtotal:</span>

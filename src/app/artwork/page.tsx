@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getArtworkImagePath } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-import PriceDisplay from '@/components/ui/PriceDisplay';
+import ArtworkCard from '@/components/ArtworkCard';
 
 interface Artist {
   id: string;
@@ -183,41 +180,23 @@ export default function ArtworkCatalog() {
           <div className="md:w-3/4">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredArtworks.map((artwork) => (
-                <Link href={`/artwork/${artwork.id}`} key={artwork.id} className="block">
-                  <div className="bg-gray-900 rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/20 group">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={getArtworkImagePath(artwork.image)}
-                        alt={artwork.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      {artwork.isEcoFriendly && (
-                        <div className="absolute top-2 right-2">
-                          <Badge variant="secondary" className="bg-green-600 text-white">
-                            Eco-Friendly
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h2 className="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">
-                        {artwork.title}
-                      </h2>
-                      <p className="text-gray-400 mb-2">by {artwork.artist.name}</p>
-                      <p className="text-gray-300 line-clamp-2 mb-4 text-sm">
-                        {artwork.description}
-                      </p>
-                      <div className="flex justify-between items-center">
-                        <PriceDisplay price={artwork.price} variant="compact" size="sm" />
-                        <Badge variant="outline" className="bg-gray-800 text-gray-300">
-                          {artwork.category}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                <ArtworkCard 
+                  key={artwork.id}
+                  artwork={{
+                    id: artwork.id,
+                    title: artwork.title,
+                    price: artwork.price,
+                    image: getArtworkImagePath(artwork.image),
+                    category: artwork.category,
+                    isEcoFriendly: artwork.isEcoFriendly,
+                    artist: {
+                      id: artwork.artistId,
+                      name: artwork.artist.name,
+                    }
+                  }}
+                  showRating={true}
+                  showArtist={true}
+                />
               ))}
             </div>
           </div>

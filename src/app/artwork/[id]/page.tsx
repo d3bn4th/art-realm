@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import BuyButton from '@/app/components/BuyButton';
 import PriceDisplay from '@/components/ui/PriceDisplay';
+import ArtworkRating from '@/components/ArtworkRating';
 
 // Replacing Skeleton with a simple div since it's not available
 const Skeleton = ({ className }: { className: string }) => (
@@ -123,6 +124,9 @@ export default function ArtworkDetailPage() {
             </div>
 
             <PriceDisplay price={artwork.price} variant="inline" size="md" />
+
+            {/* Artwork Rating Component */}
+            <ArtworkRating artworkId={artwork.id} />
 
             <div className="space-y-2">
               <h2 className="text-xl font-medium text-white">About this artwork</h2>
