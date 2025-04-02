@@ -9,9 +9,11 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const id = params.id;
+    
     // Check if artwork exists
     const artwork = await prisma.artwork.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!artwork) {
@@ -23,7 +25,7 @@ export async function GET(
 
     // Get all ratings for this artwork
     const ratings = await prisma.rating.findMany({
-      where: { artworkId: params.id },
+      where: { artworkId: id },
     });
 
     // Calculate average rating
@@ -41,7 +43,7 @@ export async function GET(
         where: {
           userId_artworkId: {
             userId: session.user.id,
-            artworkId: params.id,
+            artworkId: id,
           },
         },
       });
@@ -71,6 +73,8 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const id = params.id;
+    
     // Get the user session
     const session = await getServerSession(authOptions);
     
@@ -83,7 +87,7 @@ export async function POST(
 
     // Check if artwork exists
     const artwork = await prisma.artwork.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!artwork) {
@@ -118,7 +122,7 @@ export async function POST(
       where: {
         userId_artworkId: {
           userId: session.user.id,
-          artworkId: params.id,
+          artworkId: id,
         },
       },
       update: {
@@ -126,14 +130,14 @@ export async function POST(
       },
       create: {
         userId: session.user.id,
-        artworkId: params.id,
+        artworkId: id,
         value: ratingValue,
       },
     });
 
     // Get updated average after adding the new rating
     const ratings = await prisma.rating.findMany({
-      where: { artworkId: params.id },
+      where: { artworkId: id },
     });
 
     const totalRatings = ratings.length;
