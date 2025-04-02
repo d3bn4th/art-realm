@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   try {
     const { email, password, userType } = await request.json();
 
-    // In a real application, you would:
+    // In a real application, we would:
     // 1. Validate the input
     // 2. Check against a real database
     // 3. Use proper password hashing

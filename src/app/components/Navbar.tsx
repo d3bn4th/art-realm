@@ -22,6 +22,7 @@ const navigation = {
   main: [
     { name: 'All Artworks', href: '/artwork' },
     { name: 'Featured Artists', href: '/artists' },
+    { name: 'Feed', href: '/social-feed' },
     { name: 'Auctions', href: '/auctions' },
     { 
       name: 'Eco-Friendly Art', 
@@ -37,8 +38,7 @@ const navigation = {
     },
   ],
   pages: [
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'About', href: '/about' }
   ],
 };
 

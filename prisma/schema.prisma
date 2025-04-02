@@ -29,6 +29,7 @@ model User {
   orders    Order[]
   ratings   Rating[]
   bids      Bid[]
+  likes     Like[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -47,6 +48,7 @@ model Artwork {
   orders       Order[]
   ratings      Rating[]
   auction      Auction?
+  likes        Like[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -109,4 +111,16 @@ model Bid {
   auction     Auction  @relation(fields: [auctionId], references: [id])
   auctionId   String
   createdAt   DateTime @default(now())
+}
+
+model Like {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  artwork     Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId   String
+  createdAt   DateTime @default(now())
+
+  // Ensure a user can only like an artwork once
+  @@unique([userId, artworkId])
 } 
