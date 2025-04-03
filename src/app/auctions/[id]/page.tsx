@@ -1,11 +1,71 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { use } from 'react';
+
+// Custom implementation for formatDistanceToNow while we update date-fns
+const formatDistanceToNow = (date: Date, options?: { addSuffix?: boolean }) => {
+  const now = new Date();
+  const diffMs = Math.abs(now.getTime() - date.getTime());
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDays = Math.floor(diffHr / 24);
+  
+  let result = '';
+  if (diffDays > 0) {
+    result = diffDays === 1 ? '1 day' : `${diffDays} days`;
+  } else if (diffHr > 0) {
+    result = diffHr === 1 ? '1 hour' : `${diffHr} hours`;
+  } else if (diffMin > 0) {
+    result = diffMin === 1 ? '1 minute' : `${diffMin} minutes`;
+  } else {
+    result = 'less than a minute';
+  }
+  
+  if (options?.addSuffix) {
+    result = date > now ? `in ${result}` : `${result} ago`;
+  }
+  
+  return result;
+};
+
+// Custom implementation for format
+const format = (date: Date, formatStr: string) => {
+  // Basic formatter that handles the PPp pattern (Apr 29, 2023, 7:15 PM)
+  if (formatStr === 'PPp') {
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  }
+  
+  // Basic formatter that handles the PPpp pattern (with seconds)
+  if (formatStr === 'PPpp') {
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: true
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  }
+  
+  // Default fallback
+  return date.toLocaleString();
+};
 
 interface Bid {
   id: string;
@@ -40,8 +100,8 @@ interface Auction {
   bids: Bid[];
 }
 
-export default function AuctionDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function AuctionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { status } = useSession();
   
@@ -53,6 +113,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
   const [bidSuccess, setBidSuccess] = useState<string | null>(null);
   const [bidLoading, setBidLoading] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const fetchAuction = useCallback(async () => {
     try {
@@ -91,16 +152,22 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
       const end = new Date(auction.endTime);
       if (now >= end) {
         setTimeRemaining('Auction ended');
-        clearInterval(timer);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
       } else {
         setTimeRemaining(formatDistanceToNow(end, { addSuffix: true }));
       }
     };
     
     updateTimeRemaining();
-    const timer = setInterval(updateTimeRemaining, 1000);
+    timerRef.current = setInterval(updateTimeRemaining, 1000);
     
-    return () => clearInterval(timer);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [auction]);
 
   const handleBid = async (e: React.FormEvent) => {
@@ -244,7 +311,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-sm text-gray-600 mb-1">Auction Ends</div>
-                <div className="font-medium">
+                <div className="font-medium text-gray-800">
                   {format(new Date(auction.endTime), 'PPp')}
                 </div>
               </div>
@@ -321,7 +388,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
             </div>
           ) : (
             <div className="border border-gray-200 rounded-md p-5 bg-gray-50 text-center">
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
                 {auction.status === 'ended' ? 'Auction Ended' : 'Auction Closed'}
               </h3>
               <p className="text-gray-600">

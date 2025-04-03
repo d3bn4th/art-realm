@@ -15,6 +15,7 @@ export async function GET() {
         bio: true,
         specialties: true,
         location: true,
+        image: true,
         _count: {
           select: {
             artworks: true

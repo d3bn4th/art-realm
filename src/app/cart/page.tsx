@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,12 @@ export default function Cart() {
   const router = useRouter();
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  
+  // Fix hydration mismatch by only rendering cart data on client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleCheckout = () => {
     if (cart.items.length === 0) {
@@ -36,7 +42,7 @@ export default function Cart() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">
-            {cart.items.length === 0 ? (
+            {!isClient || cart.items.length === 0 ? (
               <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
                 <ShoppingBagIcon className="h-20 w-20 mx-auto text-gray-600 mb-4" />
                 <h2 className="text-xl font-semibold text-white mb-2">Your cart is empty</h2>
@@ -50,106 +56,91 @@ export default function Cart() {
               </div>
             ) : (
               <div className="space-y-6">
-                {cart.items.map((item) => (
-                  <div key={item.id} className="flex flex-col sm:flex-row gap-6 p-4 bg-gray-800 rounded-lg border border-gray-700 shadow-md">
-                    <div className="relative w-full sm:w-32 h-32 mx-auto sm:mx-0">
+                {isClient && cart.items.map((item) => (
+                  <div key={item.id} className="bg-gray-800 rounded-lg border border-gray-700 p-4 md:p-6 flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-1/4 aspect-square relative rounded-md overflow-hidden flex-shrink-0">
                       <Image
                         src={item.image}
                         alt={item.title}
                         fill
-                        className="object-cover rounded"
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 25vw"
                       />
                     </div>
                     <div className="flex-grow">
                       <div className="flex justify-between">
                         <div>
-                          <h3 className="font-semibold text-white text-lg">{item.title}</h3>
+                          <h3 className="text-lg font-medium text-white">{item.title}</h3>
                           <p className="text-gray-400">by {item.artistName}</p>
-                          <p className="mt-1 text-white font-medium">{formatToRupees(item.price)}</p>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.id)}
-                          className="text-gray-400 hover:text-white h-6"
+                          className="text-gray-500 hover:text-gray-300"
+                          aria-label="Remove item"
                         >
-                          <XMarkIcon className="h-6 w-6" />
+                          <XMarkIcon className="h-5 w-5" />
                         </button>
                       </div>
-                      
-                      <div className="flex items-center mt-4">
-                        <label className="text-sm text-gray-400 mr-3">Quantity:</label>
-                        <QuantitySelector
-                          quantity={item.quantity}
-                          onQuantityChange={(newQuantity) => {
-                            if (newQuantity === 0) {
-                              removeFromCart(item.id);
-                            } else {
-                              updateQuantity(item.id, newQuantity);
-                            }
-                          }}
-                          min={1}
-                          size="md"
-                        />
-                        <div className="ml-auto text-right">
-                          <span className="text-gray-400 text-sm">Subtotal:</span>
-                          <p className="text-white font-medium">{formatToRupees(item.price * item.quantity)}</p>
+                      <div className="mt-4 md:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                          <p className="text-white text-lg font-semibold">{formatToRupees(item.price)}</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <QuantitySelector
+                            quantity={item.quantity}
+                            onQuantityChange={(quantity) => updateQuantity(item.id, quantity)}
+                            min={1}
+                            max={10}
+                            size="md"
+                          />
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
-                
-                <div className="flex justify-end mt-4">
-                  <Button
-                    onClick={() => clearCart()}
-                    variant="outline"
-                    className="tmt-6 w-24 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-md py-3"
-                  >
-                    Clear Cart
-                  </Button>
-                </div>
               </div>
             )}
           </div>
-
+          
           <div className="lg:col-span-4">
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-white">Order Summary</h2>
-              <div className="space-y-4">
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 sticky top-6">
+              <h2 className="text-xl font-semibold text-white mb-6">Order Summary</h2>
+              
+              <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-300">
                   <span>Subtotal</span>
-                  <span>{formatToRupees(cart.subtotal)}</span>
+                  <span>{isClient ? formatToRupees(cart.subtotal) : '₹0.00'}</span>
+                </div>
+                <div className="flex justify-between text-gray-300">
+                  <span>Tax (10%)</span>
+                  <span>{isClient ? formatToRupees(cart.tax) : '₹0.00'}</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>Shipping</span>
-                  <span>{formatToRupees(cart.shipping)}</span>
+                  <span>{isClient ? formatToRupees(cart.shipping) : '₹0.00'}</span>
                 </div>
-                <div className="flex justify-between text-gray-300">
-                  <span>Tax</span>
-                  <span>{formatToRupees(cart.tax)}</span>
-                </div>
-                <div className="border-t border-gray-700 pt-4">
-                  <div className="flex justify-between font-semibold text-white">
-                    <span>Total</span>
-                    <span>{formatToRupees(cart.total)}</span>
-                  </div>
+                <div className="border-t border-gray-700 pt-4 flex justify-between font-semibold text-white">
+                  <span>Total</span>
+                  <span>{isClient ? formatToRupees(cart.total) : '₹0.00'}</span>
                 </div>
               </div>
+              
               <Button
                 onClick={handleCheckout}
-                disabled={cart.items.length === 0 || isLoading}
-                className="mt-6 w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-md py-3"
+                className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-3 rounded-md font-medium"
+                disabled={!isClient || cart.items.length === 0 || isLoading}
               >
                 {isLoading ? 'Processing...' : 'Proceed to Checkout'}
               </Button>
               
-              <div className="mt-6 text-sm text-gray-400">
-                <p className="flex items-center justify-center gap-1">
-                  <span>Need help?</span>
-                  <Link href="/contact" className="text-blue-400 hover:text-blue-300">
-                    Contact Support
-                  </Link>
-                </p>
-              </div>
+              {isClient && cart.items.length > 0 && (
+                <button 
+                  onClick={clearCart} 
+                  className="w-full mt-4 text-gray-400 hover:text-gray-300 text-sm"
+                >
+                  Clear Cart
+                </button>
+              )}
             </div>
           </div>
         </div>

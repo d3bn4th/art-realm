@@ -56,10 +56,12 @@ export default async function SocialFeedPage() {
   const artworks = await getArtworksWithArtistsAndLikes();
   
   return (
-    <div className="bg-white py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Art Social Feed</h1>
-        <p className="text-gray-600 text-center mb-10">
+        <h1 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+          Art Social Feed
+        </h1>
+        <p className="text-gray-300 text-center mb-10">
           Discover amazing artworks and talented artists from around the world
         </p>
         <ArtworkFeed artworks={artworks} />

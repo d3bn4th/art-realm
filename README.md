@@ -53,6 +53,7 @@ art-realm/
 ### Prerequisites
 - Node.js 18.0 or later
 - npm or yarn
+- Git
 
 ### Installation
 
@@ -61,18 +62,59 @@ art-realm/
    git clone https://github.com/d3bn4th/art-realm.git
    ```
 
-2. Install dependencies:
+2. Navigate to the project directory:
    ```bash
    cd art-realm
-   npm install
    ```
 
-3. Run the development server:
+3. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+4. Set up environment variables:
+   - Create a `.env.local` file in the root directory
+   - Add the necessary environment variables (see Configuration section)
+
+5. Set up the database:
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev --name init
+   ```
+
+6. (Optional) Seed the database with sample data:
+   ```bash
+   npx prisma db seed
+   ```
+
+### Running the Application
+
+1. Start the development server:
    ```bash
    npm run dev
+   # or
+   yarn dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+2. Open [http://localhost:3000](http://localhost:3000) in your browser to view the application
+
+### Building for Production
+
+1. Build the application:
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
+
+2. Start the production server:
+   ```bash
+   npm run start
+   # or
+   yarn start
+   ```
 
 ## 📱 Key Features Explained
 

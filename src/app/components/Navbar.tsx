@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, SparklesIcon, UserCircleIcon, ChevronDownIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -48,6 +48,12 @@ export default function Navbar() {
   const user = session?.user as CustomUser;
   const pathname = usePathname();
   const { cart } = useCart();
+  const [isClient, setIsClient] = useState(false);
+  
+  // Fix hydration mismatch by only rendering cart count on client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSignOut = () => {
     signOut({
@@ -124,7 +130,7 @@ export default function Navbar() {
               {/* Cart Button */}
               <Link href="/cart" className="mr-4 p-1 relative text-gray-700 hover:text-gray-800">
                 <ShoppingCartIcon className="h-6 w-6" />
-                {cart.items.length > 0 && (
+                {isClient && cart.items.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {cart.items.length}
                   </span>
@@ -242,7 +248,7 @@ export default function Navbar() {
                   className="block px-3 py-2 text-base font-semibold leading-7 hover:bg-gray-50 flex items-center gap-2 text-black"
                 >
                   <ShoppingCartIcon className="h-5 w-5" />
-                  Cart {cart.items.length > 0 && `(${cart.items.length})`}
+                  Cart {isClient && cart.items.length > 0 && `(${cart.items.length})`}
                 </Link>
                 
                 {navigation.main.map((item) => (
