@@ -27,6 +27,9 @@ Art Realm is a modern, full-stack e-commerce platform for buying and selling art
 - **UI Components**: 
   - Headless UI for accessible components
   - Heroicons for icons
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: NextAuth.js
 - **Type Safety**: TypeScript
 - **Deployment**: Vercel
 
@@ -43,6 +46,7 @@ art-realm/
 │   │   ├── data/          # Mock data and constants
 │   │   └── utils/         # Utility functions
 │   └── ...
+├── prisma/                 # Database schema and migrations
 ├── public/                 # Static assets
 ├── package.json           
 └── ...
@@ -53,6 +57,7 @@ art-realm/
 ### Prerequisites
 - Node.js 18.0 or later
 - npm or yarn
+- PostgreSQL (local installation or remote)
 
 ### Installation
 
@@ -67,12 +72,46 @@ art-realm/
    npm install
    ```
 
-3. Run the development server:
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory with the following variables:
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/art_realm"
+   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   CLOUDINARY_CLOUD_NAME="your-cloud-name"
+   CLOUDINARY_API_KEY="your-api-key"
+   CLOUDINARY_API_SECRET="your-api-secret"
+   ```
+
+4. Set up the database:
+   ```bash
+   # Push the Prisma schema to your database
+   npx prisma db push
+   
+   # Seed the database with initial data
+   npx prisma db seed
+   ```
+
+5. Run the development server:
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Build for production
+
+To build the application for production:
+
+```bash
+npm run build
+```
+
+To start the production server:
+
+```bash
+npm run start
+```
 
 ## 📱 Key Features Explained
 
@@ -111,13 +150,15 @@ art-realm/
 
 ## 🔧 Configuration
 
-### Environment Variables
+### Database Management
 
-Create a `.env.local` file in the root directory:
-```env
-NEXT_PUBLIC_API_URL=your_api_url
-# Add other environment variables as needed
+You can use Prisma Studio to manage your database visually:
+
+```bash
+npx prisma studio
 ```
+
+This will open a web interface at [http://localhost:5555](http://localhost:5555) where you can view and modify your data.
 
 ### Deployment
 
