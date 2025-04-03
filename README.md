@@ -57,11 +57,7 @@ art-realm/
 ### Prerequisites
 - Node.js 18.0 or later
 - npm or yarn
-<<<<<<< HEAD
-- Git
-=======
 - PostgreSQL (local installation or remote)
->>>>>>> 0e7c655613cf813c8246e0acb0418c5cebaa5836
 
 ### Installation
 
@@ -75,33 +71,6 @@ art-realm/
    cd art-realm
    ```
 
-<<<<<<< HEAD
-3. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-4. Set up environment variables:
-   - Create a `.env.local` file in the root directory
-   - Add the necessary environment variables (see Configuration section)
-
-5. Set up the database:
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev --name init
-   ```
-
-6. (Optional) Seed the database with sample data:
-   ```bash
-   npx prisma db seed
-   ```
-
-### Running the Application
-
-1. Start the development server:
-=======
 3. Set up environment variables:
    Create a `.env.local` file in the root directory with the following variables:
    ```
@@ -123,32 +92,12 @@ art-realm/
    ```
 
 5. Run the development server:
->>>>>>> 0e7c655613cf813c8246e0acb0418c5cebaa5836
    ```bash
    npm run dev
    # or
    yarn dev
    ```
 
-<<<<<<< HEAD
-2. Open [http://localhost:3000](http://localhost:3000) in your browser to view the application
-
-### Building for Production
-
-1. Build the application:
-   ```bash
-   npm run build
-   # or
-   yarn build
-   ```
-
-2. Start the production server:
-   ```bash
-   npm run start
-   # or
-   yarn start
-   ```
-=======
 6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Build for production
@@ -164,7 +113,6 @@ To start the production server:
 ```bash
 npm run start
 ```
->>>>>>> 0e7c655613cf813c8246e0acb0418c5cebaa5836
 
 ## 📱 Key Features Explained
 
