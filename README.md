@@ -2,7 +2,7 @@
 
 Art Realm is a modern, full-stack e-commerce platform for buying and selling artwork. Built with Next.js 14 and styled with Tailwind CSS, it provides a seamless experience for art enthusiasts to discover, purchase, and sell original artwork.
 
-![Art Realm Screenshot](public/images/screenshot.png)
+![Art Realm Screenshot](public/images/homepage.png)
 
 ## 🌟 Features
 
