@@ -196,6 +196,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 - Arihant Debnath - [d3bn4th](https://github.com/d3bn4th)
 - A Lalith Rahul - [A-L-RAHUL](https://github.com/A-L-RAHUL)
+- M Prahlad Karthik - [Prahlad-117](https://github.com/Prahlad-117)
 
 ## 🙏 Acknowledgments
 
